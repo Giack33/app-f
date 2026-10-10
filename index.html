@@ -1,0 +1,1122 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Trésorerie</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💶</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+:root{
+  --bg:#0b0f14; --panel:#141b24; --panel2:#1b2430; --line:#263241;
+  --txt:#e8eef5; --muted:#8da0b5; --dim:#5f7183;
+  --green:#22c55e; --orange:#f59e0b; --red:#ef4444; --blue:#38bdf8;
+  --r:16px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--bg);color:var(--txt);font-family:Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased;padding-bottom:96px;overflow-x:hidden}
+.num{font-family:'JetBrains Mono',monospace;font-variant-numeric:tabular-nums}
+.wrap{max-width:860px;margin:0 auto;padding:16px}
+.hidden{display:none!important}
+
+/* LOGIN */
+#login{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
+.loginbox{width:100%;max-width:400px;text-align:center}
+.loginbox h1{font-size:30px;letter-spacing:-.5px;margin-bottom:8px}
+.loginbox p{color:var(--muted);margin-bottom:28px;font-size:15px;line-height:1.5}
+.btn{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:14px;border-radius:12px;border:1px solid var(--line);background:var(--panel);color:var(--txt);font:600 15px Inter,sans-serif;cursor:pointer;transition:.15s}
+.btn:hover{background:var(--panel2)}
+.btn.primary{background:var(--txt);color:#0b0f14;border-color:var(--txt)}
+.btn.primary:hover{opacity:.88}
+.btn.danger{color:var(--red);border-color:#ef444455}
+.sep{display:flex;align-items:center;gap:12px;color:var(--dim);font-size:12px;margin:18px 0}
+.sep:before,.sep:after{content:'';flex:1;height:1px;background:var(--line)}
+input,select{width:100%;padding:13px;border-radius:12px;border:1px solid var(--line);background:var(--panel);color:var(--txt);font:500 15px Inter,sans-serif;margin-bottom:10px}
+input:focus,select:focus{outline:none;border-color:var(--blue)}
+label{display:block;font-size:12px;color:var(--muted);margin:0 0 6px;font-weight:600;text-transform:uppercase;letter-spacing:.4px}
+
+/* HEADER */
+header{max-width:860px;margin:0 auto;padding:18px 16px 0}
+header .ttl{font-size:13px;font-weight:600;letter-spacing:1.4px;text-transform:uppercase;color:var(--dim)}
+
+/* HERO */
+.hero{background:var(--panel);border:1px solid var(--line);border-radius:22px;padding:24px 18px;text-align:center;position:relative;overflow:hidden}
+.hero:before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--heroc,var(--green))}
+.hero .lbl{font-size:11.5px;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted);font-weight:600}
+.hero .big{font-size:clamp(34px,11vw,56px);font-weight:700;letter-spacing:-1.5px;line-height:1.1;margin:10px 0 4px;color:var(--heroc,var(--green));word-break:break-word}
+.hero .sub{color:var(--muted);font-size:13.5px;line-height:1.45}
+.verdict{display:inline-flex;align-items:center;gap:7px;margin-top:14px;padding:8px 15px;border-radius:999px;font-size:13.5px;font-weight:600;background:var(--panel2)}
+.dot{width:9px;height:9px;border-radius:50%;background:var(--heroc,var(--green));flex-shrink:0}
+
+/* GRID */
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin-top:10px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:15px;min-width:0}
+.card .k{font-size:10.5px;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);font-weight:600;line-height:1.3}
+.card .v{font-size:22px;font-weight:700;margin-top:6px;letter-spacing:-.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.card .n{font-size:11.5px;color:var(--dim);margin-top:3px;line-height:1.35}
+
+h2{font-size:13px;text-transform:uppercase;letter-spacing:.7px;color:var(--muted);margin:26px 0 10px;font-weight:600;display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+h2 .count{background:var(--panel2);color:var(--txt);border-radius:999px;padding:3px 10px;font-size:11.5px;letter-spacing:0;text-transform:none;white-space:nowrap;flex-shrink:0}
+
+/* LIST */
+.row{display:flex;align-items:center;gap:11px;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin-bottom:7px;min-width:0}
+.row .ic{width:34px;height:34px;border-radius:10px;flex-shrink:0;display:grid;place-items:center;font-size:13px;font-weight:700;background:var(--panel2)}
+.row .mid{flex:1;min-width:0}
+.row .t{font-weight:600;font-size:14.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row .s{font-size:12px;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row .amt{font-weight:700;font-size:15px;white-space:nowrap;flex-shrink:0}
+.neg{color:var(--red)}.pos{color:var(--green)}
+.empty{color:var(--dim);font-size:13.5px;padding:18px;text-align:center;border:1px dashed var(--line);border-radius:14px;line-height:1.5}
+.note{font-size:12.5px;color:var(--dim);line-height:1.5;padding:4px 2px 0}
+
+/* CHART */
+.chartbox{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:14px 10px 8px;overflow:hidden}
+.chartbox svg{display:block;width:100%;height:auto}
+.chiplist{display:flex;flex-wrap:wrap;gap:6px;padding:10px 6px 2px}
+.chiplist i{font-style:normal;display:inline-flex;align-items:center;gap:6px;font-size:11.5px;color:var(--muted);background:var(--panel2);border-radius:999px;padding:4px 10px}
+.chiplist i b{width:7px;height:7px;border-radius:50%;display:inline-block}
+
+/* VALIDATION */
+.valid{background:var(--panel2);border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:9px}
+.valid .top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start;margin-bottom:13px}
+.chips{display:flex;flex-wrap:wrap;gap:6px}
+.chip{padding:7px 12px;border-radius:999px;border:1px solid var(--line);background:var(--panel);color:var(--txt);font:600 12.5px Inter,sans-serif;cursor:pointer}
+.chip:hover{border-color:var(--blue)}
+
+/* TABS */
+nav{position:fixed;bottom:0;left:0;right:0;background:rgba(11,15,20,.94);backdrop-filter:blur(14px);border-top:1px solid var(--line);display:flex;justify-content:space-around;padding:8px 4px calc(8px + env(safe-area-inset-bottom));z-index:40}
+nav button{background:none;border:none;color:var(--dim);font:600 10px Inter,sans-serif;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;padding:5px 8px;border-radius:10px}
+nav button.on{color:var(--txt)}
+nav button span{font-size:18px;line-height:1}
+
+.fab{position:fixed;right:16px;bottom:calc(84px + env(safe-area-inset-bottom));width:54px;height:54px;border-radius:50%;background:var(--txt);color:#0b0f14;border:none;font-size:26px;cursor:pointer;box-shadow:0 10px 30px #0009;z-index:41}
+
+/* MODAL */
+.ovl{position:fixed;inset:0;background:#000b;backdrop-filter:blur(4px);display:grid;place-items:end center;z-index:50;overflow:auto}
+.sheet{background:var(--panel);border:1px solid var(--line);border-radius:22px 22px 0 0;padding:22px 20px calc(22px + env(safe-area-inset-bottom));width:100%;max-width:540px;max-height:90vh;overflow:auto}
+.sheet h3{font-size:18px;margin-bottom:16px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.toast{position:fixed;top:14px;left:50%;transform:translateX(-50%);background:var(--panel2);border:1px solid var(--line);padding:11px 18px;border-radius:999px;font-size:14px;font-weight:500;z-index:99;max-width:90vw;text-align:center}
+</style>
+</head>
+<body>
+
+<div id="login">
+  <div class="loginbox">
+    <div style="font-size:44px;margin-bottom:10px">💶</div>
+    <h1>Trésorerie</h1>
+    <p>Ton argent, piloté comme une entreprise.<br>Combien tu peux dépenser, en temps réel.</p>
+    <button class="btn primary" onclick="google()">
+      <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#4285F4" d="M45 24c0-1.6-.1-2.7-.4-4H24v7.5h12c-.2 2-1.5 5-4.4 7l6.7 5.2C42.2 36 45 30.6 45 24z"/><path fill="#34A853" d="M24 46c5.9 0 10.9-2 14.5-5.3l-6.9-5.4c-1.9 1.3-4.4 2.2-7.6 2.2-5.8 0-10.7-3.8-12.5-9.1l-7.1 5.5C8 41.1 15.4 46 24 46z"/><path fill="#FBBC05" d="M11.5 28.4c-.5-1.4-.7-2.9-.7-4.4s.3-3 .7-4.4l-7.1-5.5C2.9 17 2 20.4 2 24s.9 7 2.4 9.9l7.1-5.5z"/><path fill="#EA4335" d="M24 10.4c3.3 0 5.5 1.4 6.8 2.6l5.9-5.8C33.1 3.9 29.9 2 24 2 15.4 2 8 6.9 4.4 14.1l7.1 5.5c1.8-5.3 6.7-9.2 12.5-9.2z"/></svg>
+      Se connecter avec Google
+    </button>
+    <div class="sep">ou par e-mail</div>
+    <input type="email" id="mail" placeholder="ton@email.fr">
+    <button class="btn" onclick="magic()">Recevoir un lien de connexion</button>
+  </div>
+</div>
+
+<div id="app" class="hidden">
+  <header><div class="ttl" id="htitle">Pilotage</div></header>
+  <div class="wrap" id="view"></div>
+  <button class="fab" onclick="openAdd()">+</button>
+  <nav>
+    <button data-t="home" class="on" onclick="go('home')"><span>◎</span>Pilotage</button>
+    <button data-t="flux" onclick="go('flux')"><span>≡</span>Mouvements</button>
+    <button data-t="fixe" onclick="go('fixe')"><span>↻</span>Charges</button>
+    <button data-t="set" onclick="go('set')"><span>⚙</span>Réglages</button>
+  </nav>
+</div>
+
+<script>
+const SB = supabase.createClient(
+  'https://rjnysyddgpcjzmfbpyba.supabase.co',
+  'sb_publishable_U4U7mmNvzILkPh7LkNwkkw_2xIkoCz9'
+);
+let U=null, D={}, TAB='home';
+const TITRES={home:'Pilotage',flux:'Mouvements',fixe:'Charges & revenus',set:'Réglages'};
+const eur = n => (n<0?'-':'')+Math.abs(n).toLocaleString('fr-FR',{minimumFractionDigits:2,maximumFractionDigits:2})+' €';
+const eur0 = n => (n<0?'-':'')+Math.abs(Math.round(n)).toLocaleString('fr-FR')+' €';
+const esc = s => String(s==null?'':s).replace(/[<>&"]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));
+const jsq = s => String(s==null?'':s).replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+const PERIODE={hebdomadaire:'par semaine',mensuel:'par mois',bimestriel:'tous les 2 mois',trimestriel:'par trimestre',semestriel:'par semestre',annuel:'par an'};
+const PAR_AN={hebdomadaire:52,mensuel:12,bimestriel:6,trimestriel:4,semestriel:2,annuel:1};
+const parMois = r => Number(r.montant)*(PAR_AN[r.frequence]||12)/12;
+
+function toast(m){const t=document.createElement('div');t.className='toast';t.textContent=m;document.body.appendChild(t);setTimeout(()=>t.remove(),2600)}
+
+async function google(){
+  const {error} = await SB.auth.signInWithOAuth({provider:'google',options:{redirectTo:location.origin}});
+  if(error) toast("Google indisponible — utilise l'e-mail");
+}
+async function magic(){
+  const email = document.getElementById('mail').value.trim();
+  if(!email) return toast('Entre ton e-mail');
+  const {error} = await SB.auth.signInWithOtp({email,options:{emailRedirectTo:location.origin}});
+  toast(error ? error.message : 'Lien envoyé ! Regarde ta boîte mail.');
+}
+async function logout(){ await SB.auth.signOut(); location.reload() }
+
+/* ---------- CHARGEMENT ---------- */
+async function load(){
+  const [s,c,a,t,r,i,d,fy,fm,fi,pr,pc,fp] = await Promise.all([
+    SB.from('settings').select('*').maybeSingle(),
+    SB.from('categories').select('*').order('type').order('nom'),
+    SB.from('accounts').select('*').eq('actif',true),
+    SB.from('transactions').select('*').order('date_operation',{ascending:false}).limit(2000),
+    SB.from('recurring_charges').select('*').eq('actif',true),
+    SB.from('incomes').select('*').order('mois',{ascending:false}).limit(24),
+    SB.from('documents').select('*').eq('statut','a_traiter'),
+    SB.from('foyers').select('*').maybeSingle(),
+    SB.from('foyer_membres').select('*'),
+    SB.from('foyer_invitations').select('*'),
+    SB.from('profiles').select('id,email,full_name'),
+    SB.rpc('ponto_configure'),
+    SB.from('frais_pro').select('*').order('mois',{ascending:false}).limit(24)
+  ]);
+  D = {set:s.data||{}, cats:c.data||[], acc:a.data||[], tx:t.data||[], rec:r.data||[], inc:i.data||[], docs:d.data||[],
+       foyer:fy.data||null, membres:fm.data||[], invits:fi.data||[], profils:pr.data||[],
+       pontoCred:pc.data||null, pro:fp.data||[]};  // horodatage de configuration, jamais les identifiants
+  // Toutes les catégories servent à résoudre les libellés (dont celles du conjoint) ;
+  // au choix on ne propose que les actives, dédoublonnées par nom.
+  D.catById = Object.fromEntries(D.cats.map(x=>[x.id,x]));
+  marquerVirementsInternes();
+  const vues = new Set();
+  D.cats = D.cats
+    .filter(x=>x.actif!==false)
+    .sort((a,b)=>(b.foyer_id?1:0)-(a.foyer_id?1:0) || (a.user_id===U.id?-1:1))
+    .filter(x=>!vues.has(x.nom) && vues.add(x.nom));
+  const auj=new Date().toISOString().slice(0,10);
+  D.rec = D.rec.filter(r=>!r.date_fin || r.date_fin>=auj);
+  D.rec.sort((x,y)=>parMois(y)-parMois(x));
+  if(await rapprocherFraisPro()){
+    const {data}=await SB.from('frais_pro').select('*').order('mois',{ascending:false}).limit(24);
+    D.pro=data||[];
+  }
+  render();
+  notifsFraisPro();
+}
+
+/* ---------- ÉCHÉANCES ---------- */
+// Toutes les dates où une charge tombe entre deux bornes, quelle que soit sa fréquence.
+function echeances(r, debut, fin){
+  const out=[], pas=12/(PAR_AN[r.frequence]||12);
+  if(r.date_fin){ const f=new Date(r.date_fin+'T00:00:00'); if(f<fin) fin=f; if(fin<debut) return out; }
+  if(r.frequence==='hebdomadaire'){
+    let d=new Date(debut);
+    while(d<=fin){ out.push(new Date(d)); d.setDate(d.getDate()+7) }
+    return out;
+  }
+  if(r.frequence==='mensuel'){
+    const j=r.jour_prelevement||1;
+    let d=new Date(debut.getFullYear(),debut.getMonth(),1);
+    while(d<=fin){
+      const dim=new Date(d.getFullYear(),d.getMonth()+1,0).getDate();
+      const date=new Date(d.getFullYear(),d.getMonth(),Math.min(j,dim));
+      if(date>=debut && date<=fin) out.push(date);
+      d.setMonth(d.getMonth()+1);
+    }
+    return out;
+  }
+  // bimestriel / trimestriel / semestriel / annuel : on part de la prochaine échéance connue
+  if(!r.prochaine_echeance) return out;
+  let d=new Date(r.prochaine_echeance+'T00:00:00');
+  while(d<debut){ d.setMonth(d.getMonth()+pas) }
+  while(d<=fin){ out.push(new Date(d)); d.setMonth(d.getMonth()+pas) }
+  return out;
+}
+
+/* ---------- VIREMENTS INTERNES ---------- */
+// Un virement d'un compte du foyer vers un autre n'est ni une depense ni un revenu :
+// c'est le meme argent qui change de poche. On apparie chaque debit avec un credit
+// du meme montant sur un autre compte, a 4 jours pres, puis on neutralise les deux.
+function marquerVirementsInternes(){
+  D.tx.forEach(t=>{ t.interne=false });
+  const credits={};
+  D.tx.filter(t=>Number(t.montant)>0).forEach(t=>{
+    const k=Number(t.montant).toFixed(2); (credits[k]=credits[k]||[]).push(t);
+  });
+  D.tx.filter(t=>Number(t.montant)<0).forEach(d=>{
+    const lot=credits[Math.abs(Number(d.montant)).toFixed(2)]; if(!lot) return;
+    const dd=new Date(d.date_operation+'T00:00:00');
+    const c=lot.find(x=>!x.interne && x.account_id!==d.account_id
+      && Math.abs(new Date(x.date_operation+'T00:00:00')-dd)<=4*864e5);
+    if(c){ d.interne=true; c.interne=true }
+  });
+}
+
+/* ---------- ENTREES ATTENDUES ---------- */
+// Cle de regroupement d'un credit : on ne garde que le nom de l'emetteur,
+// debarrasse des numeros de virement et du jargon bancaire.
+function cleEntree(t){
+  const s=(t.contrepartie||t.libelle||'').toUpperCase()
+    .replace(/REF\s*:.*$/,' ').replace(/MOTIF.*$/,' ')
+    .replace(/[0-9]+/g,' ')
+    .replace(/\bVIR(EMENT)?\b|\bINST(ANTANE)?\b|\bEUROPEEN\b|\bPERM\b|\bRECU\b|\bEMIS\b|\bLOGITEL\b|\bWERO\b|\bDE\s*:|\bPOUR\s*:/g,' ')
+    .replace(/[^A-Z ]/g,' ').replace(/\s+/g,' ').trim();
+  return s.split(' ').filter(w=>w.length>1).slice(0,3).join(' ');
+}
+function nomEntree(k){
+  if(/GENERALI/.test(k)) return 'Salaire Generali';
+  return k.split(' ').map(w=>w.charAt(0)+w.slice(1).toLowerCase()).join(' ');
+}
+// Un emetteur qui verse au moins 2 mois sur les 6 derniers, et encore recemment, est
+// considere comme recurrent. On ne retient qu'un versement par mois (le plus gros : le
+// salaire, pas le petit remboursement du meme emetteur), puis on moyenne les 3 derniers.
+function entreesRecurrentes(){
+  const now=new Date(), limite=new Date(now.getFullYear(),now.getMonth()-5,1);
+  const grp={};
+  D.tx.forEach(t=>{
+    const v=Number(t.montant);
+    if(v<=0 || t.interne || t.statut==='ignoree') return;
+    if(v<150) return;                                  // on laisse de cote les petits remboursements
+    const d=new Date(t.date_operation+'T00:00:00'); if(d<limite) return;
+    const k=cleEntree(t); if(!k) return;
+    const km=d.getFullYear()+'-'+d.getMonth();
+    const g=grp[k]=grp[k]||{};
+    if(!g[km] || v>g[km].montant) g[km]={montant:v,d};
+  });
+  const out=[];
+  Object.entries(grp).forEach(([k,parMoisK])=>{
+    const lot=Object.values(parMoisK).sort((a,b)=>b.d-a.d);
+    if(lot.length<2) return;                           // pas assez regulier pour etre projete
+    if((now-lot[0].d)>50*864e5) return;                // tari depuis plus d'un mois et demi : on n'extrapole pas
+    const der=lot.slice(0,3);
+    const jours=der.map(x=>x.d.getDate()).sort((a,b)=>a-b);
+    out.push({nom:nomEntree(k),
+              montant:Math.round(der.reduce((s,x)=>s+x.montant,0)/der.length*100)/100,
+              jour:jours[Math.floor(jours.length/2)], dernier:lot[0].d});
+  });
+  return out.sort((a,b)=>b.montant-a.montant);
+}
+// Projette ces entrees sur la periode demandee, sans redoubler une entree
+// deja encaissee dans le mois concerne.
+function entreesPrevues(debut,fin){
+  const out=[], rec=entreesRecurrentes();
+  const poser=(nom,montant,jour,dejaVu)=>{
+    let d=new Date(debut.getFullYear(),debut.getMonth(),1);
+    while(d<=fin){
+      const dim=new Date(d.getFullYear(),d.getMonth()+1,0).getDate();
+      const date=new Date(d.getFullYear(),d.getMonth(),Math.min(jour,dim));
+      if(date>=debut && date<=fin && !dejaVu(date)) out.push({nom,montant,date,estime:true});
+      d.setMonth(d.getMonth()+1);
+    }
+  };
+  rec.forEach(r=>poser(r.nom,r.montant,r.jour,
+    date=>r.dernier.getFullYear()===date.getFullYear() && r.dernier.getMonth()===date.getMonth()));
+
+  // Filet de securite : le salaire Generali, si l'historique des credits ne l'a pas encore vu
+  // (il arrive le 25 a un jour pres, pour un montant variable selon les commissions).
+  if(!rec.some(r=>/generali/i.test(r.nom))){
+    const sal=D.inc.filter(i=>/salaire/i.test(i.source||'')).slice(0,3);
+    if(sal.length){
+      const montant=Math.round(sal.reduce((s,i)=>s+Number(i.montant_net),0)/sal.length*100)/100;
+      poser('Salaire Generali (estime)',montant,Number(D.set.jour_rappel_paie||25),
+        date=>D.inc.some(i=>/salaire/i.test(i.source||'') && String(i.mois).slice(0,7)===
+          date.getFullYear()+'-'+String(date.getMonth()+1).padStart(2,'0')));
+    }
+  }
+  return out.sort((a,b)=>a.date-b.date);
+}
+
+/* ---------- MOTEUR DE CALCUL ---------- */
+function moteur(){
+  const now=new Date(), Y=now.getFullYear(), M=now.getMonth(), today=now.getDate();
+  const aujourdhui=new Date(Y,M,today);
+  const finMois=new Date(Y,M+1,0);
+  const HORIZON=60;                                  // on projette 60 jours : la fin du mois seule ne veut rien dire
+  const fin=new Date(Y,M,today+HORIZON-1);
+  const joursRestants=finMois.getDate()-today+1;
+
+  const solde=D.acc.filter(a=>a.type==='courant'&&!a.exclu_budget).reduce((s,a)=>s+Number(a.solde),0);
+
+  // ce qui tombe encore d'ici la fin du mois, toutes fréquences confondues
+  const aVenir=[];
+  D.rec.forEach(r=>echeances(r,aujourdhui,fin).forEach(d=>aVenir.push({nom:r.nom,montant:Number(r.montant),date:d,abo:r.est_abonnement,freq:r.frequence})));
+  D.docs.forEach(x=>{
+    if(!x.montant) return;
+    const d=x.date_echeance?new Date(x.date_echeance+'T00:00:00'):null;
+    if(d && d>=aujourdhui && d<=fin) aVenir.push({nom:x.fournisseur||'Facture',montant:Number(x.montant),date:d,facture:true});
+  });
+  aVenir.sort((a,b)=>a.date-b.date);
+  const totalAVenir=aVenir.reduce((s,x)=>s+x.montant,0);
+  const aVenirMois=aVenir.filter(x=>x.date<=finMois);
+  const totalAVenirMois=aVenirMois.reduce((s,x)=>s+x.montant,0);
+
+  // frais pro declares : virement Generali attendu, pas encore rapproche
+  const proPrevus=(D.pro||[]).filter(p=>p.statut==='declare'&&p.montant&&p.date_virement_prevue)
+    .map(p=>({mois:p.mois,montant:Number(p.montant),date:new Date(p.date_virement_prevue+'T00:00:00')}))
+    .sort((a,b)=>a.date-b.date);
+  const totalProPrevu=proPrevus.reduce((s,x)=>s+x.montant,0);
+  const proRecu=(D.pro||[]).find(p=>p.statut==='recu'&&!p.date_virement_n26);
+
+  // épargne du mois pas encore mise de côté
+  const objEp=Number(D.set.objectif_epargne_mensuel||0);
+  const dejaEp=D.tx.filter(t=>{
+    const c=D.catById[t.category_id], dt=new Date(t.date_operation+'T00:00:00');
+    return c && c.type==='epargne' && dt.getFullYear()===Y && dt.getMonth()===M;
+  }).reduce((s,t)=>s+Math.abs(Number(t.montant)),0);
+  const epRestante=Math.max(0,objEp-dejaEp);
+
+  // Entrees attendues : salaire, apport du conjoint, remboursement de frais pro.
+  // Sans elles la courbe plongeait mecaniquement : elle ne voyait que les sorties.
+  const inflows=[...entreesPrevues(aujourdhui,fin),
+                 ...proPrevus.map(p=>({nom:'Frais pro Generali',montant:p.montant,date:p.date,pro:true}))]
+                .filter(e=>e.date>aujourdhui && e.date<=fin)
+                .sort((a,b)=>a.date-b.date);
+  const totalEntrees=inflows.reduce((s,e)=>s+e.montant,0);
+  const prochaine=inflows[0]||null;
+
+  // Le reste a vivre se compte jusqu'a la prochaine entree d'argent, pas jusqu'au 31.
+  const borne=prochaine?prochaine.date:finMois;
+  const joursAvantEntree=Math.max(1,Math.round((borne-aujourdhui)/864e5));
+  const sortiesAvantEntree=aVenir.filter(x=>x.date<=borne).reduce((s,x)=>s+x.montant,0);
+  const reste=solde-sortiesAvantEntree-epRestante;
+  const hebdo=reste/(joursAvantEntree/7);
+  const parJour=reste/joursAvantEntree;
+
+  const so=Number(D.set.seuil_orange??200), sr=Number(D.set.seuil_rouge??50);
+  let couleur='var(--green)', verdict='Tu peux dépenser';
+  if(reste<sr){couleur='var(--red)'; verdict="C'est chaud — on serre"}
+  else if(reste<so){couleur='var(--orange)'; verdict='Prudence cette semaine'}
+
+  // dépenses par catégorie, ce mois-ci et le mois dernier
+  const pm=new Date(Y,M-1,1);
+  const parCat={}, parCatPrec={};
+  let depMois=0;
+  D.tx.forEach(t=>{
+    if(Number(t.montant)>=0 || t.statut==='ignoree' || t.interne) return;
+    const dt=new Date(t.date_operation+'T00:00:00');
+    const nom=D.catById[t.category_id]?.nom||'Non classé', v=Math.abs(Number(t.montant));
+    if(dt.getFullYear()===Y && dt.getMonth()===M){ parCat[nom]=(parCat[nom]||0)+v; depMois+=v }
+    else if(dt.getFullYear()===pm.getFullYear() && dt.getMonth()===pm.getMonth()){ parCatPrec[nom]=(parCatPrec[nom]||0)+v }
+  });
+
+  // revenu mensuel moyen, calculé par mois puis moyenné
+  const parMoisRev={};
+  D.inc.filter(i=>!i.hors_budget).forEach(i=>{ parMoisRev[i.mois]=(parMoisRev[i.mois]||0)+Number(i.montant_net) });
+  const moisTries=Object.keys(parMoisRev).sort().reverse().slice(0,3);
+  const revMoy=moisTries.length?moisTries.reduce((s,k)=>s+parMoisRev[k],0)/moisTries.length:0;
+
+  // projection jour par jour jusqu'à la fin du mois seulement.
+  // Aucun salaire futur n'est injecté : il est variable, donc inconnu tant qu'il n'est pas saisi.
+  const sorties={}, detail={};
+  aVenir.forEach(x=>{
+    if(x.date<=aujourdhui) return;
+    const k=x.date.toDateString();
+    sorties[k]=(sorties[k]||0)+x.montant;
+    (detail[k]=detail[k]||[]).push(x.nom);
+  });
+  const entrees={}, detailIn={};
+  inflows.forEach(p=>{ const k=p.date.toDateString(); entrees[k]=(entrees[k]||0)+p.montant; (detailIn[k]=detailIn[k]||[]).push(p.nom) });
+  const quotidien=parJourMoyen();
+  const proj=[]; let bal=solde;
+  for(let k=0;k<HORIZON;k++){
+    const d=new Date(Y,M,today+k);
+    const key=d.toDateString();
+    if(k>0){
+      bal-=sorties[key]||0;
+      bal+=entrees[key]||0;
+      bal-=quotidien;
+    }
+    proj.push({d,bal,out:sorties[key]||0,inn:entrees[key]||0,noms:detail[key]||[],nomsIn:detailIn[key]||[]});
+  }
+  const finMoisBal=proj.length?proj[Math.min(joursRestants-1,proj.length-1)].bal:solde;
+  const finHorizonBal=proj.length?proj[proj.length-1].bal:solde;
+  const negPrevu=proj.find(x=>x.bal<0)||null;
+
+  return {solde,totalAVenir,epRestante,reste,hebdo,parJour,couleur,verdict,joursRestants,finMois,finMoisBal,
+          HORIZON,fin,finHorizonBal,inflows,totalEntrees,prochaine,joursAvantEntree,aVenirMois,totalAVenirMois,negPrevu,
+          parCat,parCatPrec,depMois,proj,aVenir,revMoy,quotidien,proPrevus,totalProPrevu,proRecu,
+          aValider:D.tx.filter(t=>t.statut==='a_valider'),
+          abos:D.rec.filter(r=>r.est_abonnement),
+          chargesMois:D.rec.reduce((s,r)=>s+parMois(r),0)};
+}
+function parJourMoyen(){
+  const d30=D.tx.filter(t=>Number(t.montant)<0 && t.statut!=='ignoree' && !t.interne
+    && (Date.now()-new Date(t.date_operation+'T00:00:00'))<30*864e5
+    && !depenseNeutre(t));
+  return d30.length?d30.reduce((s,t)=>s+Math.abs(Number(t.montant)),0)/30:0;
+}
+// Ni train de vie, ni dépense reelle : les charges fixes (deja projetees a leur date),
+// l'epargne (mise de cote, pas depensee), les frais pro (rembourses) et les transferts internes.
+function depenseNeutre(t){
+  const c=D.catById[t.category_id];
+  if(!c) return false;
+  return c.type==='fixe' || c.type==='epargne' || /transfert|frais pro/i.test(c.nom||'');
+}
+
+/* ---------- VUES ---------- */
+function render(){
+  document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.t===TAB));
+  document.getElementById('htitle').textContent=TITRES[TAB];
+  document.getElementById('view').innerHTML={home:vHome,flux:vFlux,fixe:vFixe,set:vSet}[TAB]();
+  document.querySelector('.fab').classList.toggle('hidden',TAB==='set');
+  if(TAB==='home') drawChart();
+}
+function go(t){TAB=t;render();window.scrollTo(0,0)}
+
+function vHome(){
+  const m=moteur();
+  const dernier=m.finMois.getDate();
+  let h=`<div class="hero" style="--heroc:${m.couleur}">
+    <div class="lbl">Reste à vivre</div>
+    <div class="big num">${eur(m.reste)}</div>
+    <div class="sub">pour ${m.joursAvantEntree} jour${m.joursAvantEntree>1?'s':''} — ${m.prochaine?`jusqu'à ${esc(m.prochaine.nom)} le ${m.prochaine.date.toLocaleDateString('fr-FR',{day:'numeric',month:'short'})}`:"jusqu'à la fin du mois"} · charges déjà déduites</div>
+    <div class="verdict"><i class="dot"></i>${m.verdict}</div>
+  </div>
+  <div class="grid">
+    <div class="card"><div class="k">Budget semaine</div><div class="v num" style="color:${m.couleur}">${eur0(m.hebdo)}</div><div class="n">${eur0(m.parJour)} par jour</div></div>
+    <div class="card"><div class="k">Solde réel</div><div class="v num">${eur0(m.solde)}</div><div class="n">${D.acc.filter(a=>!a.exclu_budget).length} compte(s) perso</div></div>
+    <div class="card"><div class="k">À sortir d'ici le ${dernier}</div><div class="v num neg">${eur0(m.totalAVenirMois)}</div><div class="n">${m.aVenirMois.length} échéance${m.aVenirMois.length>1?'s':''}</div></div>
+    <div class="card"><div class="k">À rentrer d'ici le ${dernier}</div><div class="v num pos">${eur0(m.inflows.filter(e=>e.date<=m.finMois).reduce((s,e)=>s+e.montant,0))}</div><div class="n">${m.prochaine?`prochaine le ${m.prochaine.date.toLocaleDateString('fr-FR',{day:'numeric',month:'short'})}`:'rien d\'identifié'}</div></div>
+    <div class="card"><div class="k">Solde projeté au ${dernier}</div><div class="v num" style="color:${m.finMoisBal<0?'var(--red)':'var(--txt)'}">${eur0(m.finMoisBal)}</div><div class="n">entrées, charges et train de vie compris</div></div>
+    <div class="card"><div class="k">Dans ${m.HORIZON} jours</div><div class="v num" style="color:${m.finHorizonBal<0?'var(--red)':'var(--txt)'}">${eur0(m.finHorizonBal)}</div><div class="n">au ${m.fin.toLocaleDateString('fr-FR',{day:'numeric',month:'short'})}</div></div>
+    <div class="card"><div class="k">Charges fixes</div><div class="v num">${eur0(m.chargesMois)}</div><div class="n">moyenne lissée / mois</div></div>
+  </div>`;
+
+  if(m.proRecu){
+    h+=`<div class="empty" style="border-color:#22c55e66;color:var(--green);margin:12px 0">✅ Remboursement Generali reçu : ${eur(Number(m.proRecu.montant_recu||m.proRecu.montant))}. Combien tu vires sur N26 ?
+      <div style="margin-top:12px"><button class="btn" onclick="openVirN26('${m.proRecu.id}')">Saisir le virement N26</button></div></div>`;
+  }
+
+  if(m.aValider.length){
+    h+=`<h2>À confirmer <span class="count">${m.aValider.length}</span></h2>`;
+    m.aValider.slice(0,6).forEach(t=>{
+      h+=`<div class="valid"><div class="top">
+          <div style="min-width:0"><div class="t">${esc(t.libelle)}</div>
+          <div class="s">${new Date(t.date_operation+'T00:00:00').toLocaleDateString('fr-FR',{day:'numeric',month:'long'})}</div></div>
+          <div class="amt ${Number(t.montant)<0?'neg':'pos'}" style="font-size:18px">${eur(Number(t.montant))}</div></div>
+        <div class="chips">${D.cats.filter(c=>c.type!=='revenu').map(c=>
+          `<button class="chip" onclick="classe('${t.id}','${c.id}','${jsq(t.libelle)}')">${esc(c.nom)}</button>`).join('')}</div></div>`;
+    });
+  }
+
+  h+=`<h2>Les ${m.HORIZON} prochains jours <span class="count">${m.negPrevu?'⚠ passage en négatif':'jamais en négatif'}</span></h2><div class="chartbox"><div id="chart"></div></div>`;
+  if(!m.quotidien) h+=`<div class="note">Les dépenses du quotidien ne sont pas encore estimées : la courbe ne tient compte que des charges connues.</div>`;
+
+  h+=`<h2>Ce qui tombe bientôt <span class="count">${eur0(m.totalAVenirMois)}</span></h2>`;
+  h+=m.aVenirMois.length?m.aVenirMois.map(p=>`<div class="row">
+      <div class="ic">${p.facture?'📄':p.abo?'🔁':'🏠'}</div>
+      <div class="mid"><div class="t">${esc(p.nom)}</div>
+      <div class="s">${p.date.toLocaleDateString('fr-FR',{weekday:'short',day:'numeric',month:'short'})}${p.facture?' · facture':''}</div></div>
+      <div class="amt neg">${eur(-p.montant)}</div></div>`).join('')
+    : `<div class="empty">Plus rien à sortir d'ici la fin du mois.</div>`;
+
+  const cats=Object.entries(m.parCat).sort((a,b)=>b[1]-a[1]);
+  h+=`<h2>Dépenses du mois <span class="count">${eur0(m.depMois)}</span></h2>`;
+  h+=cats.length?cats.map(([n,v])=>{
+      const prec=m.parCatPrec[n]||0, diff=prec?Math.round((v-prec)/prec*100):null;
+      const col=D.cats.find(c=>c.nom===n)?.couleur||'#64748b';
+      return `<div class="row">
+        <div class="ic" style="background:${col}22;color:${col}">${Math.round(v/m.depMois*100)}%</div>
+        <div class="mid"><div class="t">${esc(n)}</div>
+        <div class="s">${diff===null?'pas de comparaison':(diff>0?`▲ ${diff}% vs mois dernier`:`▼ ${Math.abs(diff)}% vs mois dernier`)}</div></div>
+        <div class="amt">${eur0(v)}</div></div>`;
+    }).join('') : `<div class="empty">Aucune dépense enregistrée ce mois-ci.</div>`;
+
+  if(m.abos.length){
+    const tot=m.abos.reduce((s,a)=>s+parMois(a),0);
+    h+=`<h2>Abonnements <span class="count">${eur0(tot)} / mois</span></h2>`;
+    h+=m.abos.map(a=>`<div class="row"><div class="ic">🔁</div>
+      <div class="mid"><div class="t">${esc(a.nom)}</div>
+      <div class="s">${a.fin_essai_gratuit?`⚠ essai gratuit jusqu'au ${new Date(a.fin_essai_gratuit+'T00:00:00').toLocaleDateString('fr-FR')}`:`le ${a.jour_prelevement||'?'} ${PERIODE[a.frequence]||''}`}</div></div>
+      <div class="amt neg">${eur(-a.montant)}</div></div>`).join('');
+    h+=`<div class="note">Soit ${eur0(tot*12)} sur l'année.</div>`;
+  }
+  return h;
+}
+
+function drawChart(){
+  const m=moteur(), p=m.proj; if(p.length<2) return;
+  const W=720,H=252,L=56,R=74,T=26,B=38;
+  const vals=p.map(x=>x.bal);
+  let mn=Math.min(0,...vals), mx=Math.max(...vals,0);
+  if(mx===mn) mx=mn+100;
+  const pad=(mx-mn)*0.14; mn-=pad; mx+=pad;
+  const n=p.length;
+  const step=(W-L-R)/(n-1);
+  const X=i=>L+i*step;
+  const Y=v=>T+(mx-v)/(mx-mn)*(H-T-B);
+  const f1=v=>v.toFixed(1);
+  const col=m.couleur;
+
+  // bandes du week-end
+  let we='';
+  p.forEach((x,i)=>{
+    const j=x.d.getDay();
+    if(j===0||j===6){
+      const x0=Math.max(L,X(i)-step/2), x1=Math.min(W-R,X(i)+step/2);
+      we+=`<rect x="${f1(x0)}" y="${T}" width="${f1(Math.max(0,x1-x0))}" height="${H-T-B}" fill="#ffffff" opacity=".022"/>`;
+    }
+  });
+
+  // grille + échelle
+  let gy='';
+  const niveaux=[mx,mx-(mx-mn)/3,mn+(mx-mn)/3,mn];
+  niveaux.forEach(v=>{
+    gy+=`<line x1="${L}" y1="${f1(Y(v))}" x2="${W-R}" y2="${f1(Y(v))}" stroke="#263241" stroke-width="1"/>
+         <text x="${L-8}" y="${f1(Y(v)+3.5)}" fill="#5f7183" font-size="10.5" font-family="Inter,sans-serif" text-anchor="end">${eur0(v)}</text>`;
+  });
+
+  const line=p.map((x,i)=>`${i?'L':'M'}${f1(X(i))} ${f1(Y(x.bal))}`).join(' ');
+  const base=Y(mn);
+  const area=`${line} L${f1(X(n-1))} ${f1(base)} L${f1(X(0))} ${f1(base)} Z`;
+  const z=Y(0);
+  const neg=p.find(x=>x.bal<0);
+
+  // repères : jours où une charge tombe
+  let marks='';
+  const gros=[...p].filter(x=>x.out>0).sort((a,b)=>b.out-a.out).slice(0,3).map(x=>x.d.toDateString());
+  p.forEach((x,i)=>{
+    if(!x.out && !x.inn) return;
+    const c=x.inn>x.out?'#22c55e':'#ef4444';
+    marks+=`<line x1="${f1(X(i))}" y1="${f1(Y(x.bal))}" x2="${f1(X(i))}" y2="${H-B}" stroke="${c}" stroke-width="1" opacity=".28"/>
+            <circle cx="${f1(X(i))}" cy="${f1(Y(x.bal))}" r="3.2" fill="#141b24" stroke="${c}" stroke-width="1.8"/>`;
+    if(x.out>0 && gros.includes(x.d.toDateString())){
+      const anc=i>n-5?'end':(i<4?'start':'middle');
+      marks+=`<text x="${f1(X(i))}" y="${f1(Math.max(T+10,Y(x.bal)-10))}" fill="#8da0b5" font-size="10" font-family="Inter,sans-serif" text-anchor="${anc}">−${eur0(x.out)}</text>`;
+    }
+  });
+
+  // dates en bas : aujourd'hui, tous les 7 jours, fin de mois
+  let lbl='';
+  const idx=new Set([0,n-1]);
+  const pas=n>35?14:7;
+  for(let i=pas;i<n-3;i+=pas) idx.add(i);
+  [...idx].sort((a,b)=>a-b).forEach(i=>{
+    const anc=i===0?'start':(i===n-1?'end':'middle');
+    const txt=i===0?"auj.":p[i].d.toLocaleDateString('fr-FR',{day:'numeric',month:'short'});
+    lbl+=`<text x="${f1(X(i))}" y="${H-12}" fill="#5f7183" font-size="11" font-family="Inter,sans-serif" text-anchor="${anc}">${txt}</text>`;
+  });
+
+  // étiquette de fin de mois
+  const yEnd=Math.min(H-B-12,Math.max(T+12,Y(p[n-1].bal)));
+  const fin=eur0(p[n-1].bal);
+  const wBox=Math.max(52,fin.length*7.6);
+  const endCol=p[n-1].bal<0?'#ef4444':col;
+
+  document.getElementById('chart').innerHTML=`<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" role="img">
+    <defs><linearGradient id="gr" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="${col}" stop-opacity=".30"/><stop offset="100%" stop-color="${col}" stop-opacity="0"/></linearGradient></defs>
+    ${we}
+    ${gy}
+    ${z>T&&z<H-B?`<line x1="${L}" y1="${f1(z)}" x2="${W-R}" y2="${f1(z)}" stroke="#ef4444" stroke-width="1.2" stroke-dasharray="5 4" opacity=".7"/>`:''}
+    <path d="${area}" fill="url(#gr)"/>
+    <path d="${line}" fill="none" stroke="${col}" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>
+    ${marks}
+    <circle cx="${f1(X(0))}" cy="${f1(Y(p[0].bal))}" r="5" fill="${col}"/>
+    <circle cx="${f1(X(0))}" cy="${f1(Y(p[0].bal))}" r="9" fill="${col}" opacity=".22"/>
+    <circle cx="${f1(X(n-1))}" cy="${f1(Y(p[n-1].bal))}" r="4" fill="${endCol}"/>
+    <rect x="${W-R+4}" y="${f1(yEnd-11)}" width="${f1(Math.min(wBox,R-8))}" height="22" rx="6" fill="${endCol}" opacity=".16"/>
+    <text x="${W-R+10}" y="${f1(yEnd+4)}" fill="${endCol}" font-size="12" font-weight="700" font-family="'JetBrains Mono',monospace">${fin}</text>
+    ${lbl}</svg>
+    <div class="chiplist"><i><b style="background:${col}"></b>solde projeté</i><i><b style="background:#ef4444"></b>charge</i>${m.inflows.length?`<i><b style="background:#22c55e"></b>entrée attendue</i>`:''}<i>−${eur0(m.quotidien)}/jour de train de vie</i></div>
+    ${neg?`<div style="color:var(--red);font-size:12.5px;font-weight:600;padding:2px 6px 4px">⚠ Solde négatif prévu le ${neg.d.toLocaleDateString('fr-FR',{day:'numeric',month:'long'})}</div>`:''}`;
+}
+
+function vFlux(){
+  let h=`<h2>Mouvements <span class="count">${D.tx.length}</span></h2>`;
+  if(!D.tx.length) return h+`<div class="empty">Rien pour l'instant.<br>Appuie sur + pour saisir une dépense.</div>`;
+  let jour='';
+  D.tx.slice(0,150).forEach(t=>{
+    const j=new Date(t.date_operation+'T00:00:00').toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'});
+    if(j!==jour){h+=`<div style="color:var(--dim);font-size:11.5px;font-weight:600;margin:16px 0 7px;text-transform:uppercase;letter-spacing:.5px">${j}</div>`;jour=j}
+    const c=D.catById[t.category_id];
+    h+=`<div class="row"><div class="ic" style="background:${c?c.couleur+'22':'#1b2430'};color:${c?c.couleur:'var(--dim)'}">${t.statut==='a_valider'?'?':'●'}</div>
+      <div class="mid"><div class="t">${esc(t.libelle)}</div><div class="s">${c?esc(c.nom):'à classer'}</div></div>
+      <div class="amt ${Number(t.montant)<0?'neg':'pos'}">${eur(Number(t.montant))}</div></div>`;
+  });
+  return h;
+}
+
+function vFixe(){
+  const tot=D.rec.reduce((s,r)=>s+parMois(r),0);
+  let h=`<h2>Charges fixes <span class="count">${eur0(tot)} / mois</span></h2>
+  <button class="btn" style="margin-bottom:12px" onclick="openRec()">+ Ajouter une charge</button>`;
+  h+=D.rec.length?D.rec.map(r=>{
+    const lisse=r.frequence!=='mensuel'?` · ${eur0(parMois(r))}/mois lissé`:'';
+    const quand=r.frequence==='mensuel'?`le ${r.jour_prelevement||'?'} du mois`
+      :(r.prochaine_echeance?`prochaine : ${new Date(r.prochaine_echeance+'T00:00:00').toLocaleDateString('fr-FR',{day:'numeric',month:'short',year:'2-digit'})}`:PERIODE[r.frequence]);
+    return `<div class="row"><div class="ic">${r.est_abonnement?'🔁':'🏠'}</div>
+      <div class="mid"><div class="t">${esc(r.nom)}</div><div class="s">${quand}${lisse}</div></div>
+      <div class="amt neg">${eur(-r.montant)}</div>
+      <button class="chip" style="padding:5px 9px" onclick="delRec('${r.id}','${jsq(r.nom)}')">✕</button></div>`;
+  }).join('') : `<div class="empty">Ajoute loyer, crédits, assurances, abonnements.</div>`;
+
+  const parM={};
+  D.inc.forEach(i=>{ (parM[i.mois]=parM[i.mois]||[]).push(i) });
+  h+=`<h2>Revenus</h2>
+  <div class="two" style="margin-bottom:12px"><button class="btn" onclick="openInc()">+ Revenu</button><button class="btn" onclick="openFraisPro()">+ Frais pro</button></div>`;
+  const mois=Object.keys(parM).sort().reverse();
+  h+=mois.length?mois.map(k=>{
+    const t=parM[k].filter(i=>!i.hors_budget).reduce((s,i)=>s+Number(i.montant_net),0);
+    const p=parM[k].filter(i=>i.hors_budget).reduce((s,i)=>s+Number(i.montant_net),0);
+    return `<div class="row"><div class="ic">💰</div>
+      <div class="mid"><div class="t">${new Date(k+'T00:00:00').toLocaleDateString('fr-FR',{month:'long',year:'numeric'})}</div>
+      <div class="s">${parM[k].map(i=>esc(i.source)).join(' + ')}${p?` · dont ${eur0(p)} hors budget`:''}</div></div>
+      <div class="amt pos">${eur(t)}</div></div>`;
+  }).join('') : `<div class="empty">Ton salaire varie : saisis-le chaque mois.</div>`;
+
+  h+=`<h2>Frais pro Generali</h2>`;
+  h+=(D.pro||[]).length?D.pro.map(p=>{
+    const nm=new Date(p.mois+'T00:00:00').toLocaleDateString('fr-FR',{month:'long',year:'numeric'});
+    const ic=p.statut==='sans_frais'?'—':(p.statut==='recu'?'✅':'⏳');
+    let s;
+    if(p.statut==='sans_frais') s='aucun frais ce mois-là';
+    else if(p.statut==='recu') s=`reçu ${eur0(Number(p.montant_recu||p.montant))}`+(p.date_virement_n26?` · ${eur0(Number(p.montant_vire_n26))} virés sur N26`:' · virement N26 à saisir');
+    else s=`déclaré · virement attendu le ${p.date_virement_prevue?new Date(p.date_virement_prevue+'T00:00:00').toLocaleDateString('fr-FR',{day:'numeric',month:'short'}):'?'}`;
+    return `<div class="row"><div class="ic">${ic}</div>
+      <div class="mid"><div class="t">${nm}</div><div class="s">${s}</div></div>
+      <div class="amt ${p.montant?'pos':''}">${p.montant?eur(Number(p.montant)):''}</div>
+      ${p.statut==='recu'&&!p.date_virement_n26?`<button class="chip" style="padding:5px 9px" onclick="openVirN26('${p.id}')">N26</button>`:''}
+      ${p.statut==='declare'?`<button class="chip" style="padding:5px 9px" onclick="openFraisPro('${p.mois}')">✎</button>`:''}</div>`;
+  }).join('') : `<div class="empty">Rien encore — le rappel arrive le ${Number(D.set.jour_rappel_frais_pro||15)} du mois.</div>`;
+  return h;
+}
+
+function vSet(){
+  const jour=new Date().getDate();
+  const moisCourant=new Date().toISOString().slice(0,7)+'-01';
+  const paieFaite=D.inc.some(i=>i.mois===moisCourant);
+  let h='';
+  const an=new Date().getFullYear(), moisImpots=Number(D.set.mois_rappel_impots||7);
+  const impotsFait=D.rec.some(r=>r.nom.includes(`revenus ${an-1}`)) ||
+                   (D.set.impots_traites_an && Number(D.set.impots_traites_an)===an);
+  if(new Date().getMonth()+1>=moisImpots && new Date().getMonth()+1<9 && !impotsFait)
+    h+=`<div class="empty" style="border-color:#64748b88;color:var(--muted);margin-bottom:12px">🧾 Régularisation d'impôt sur le revenu : tu as reçu ton avis ?
+    <div style="margin-top:12px"><button class="btn" onclick="openImpots()">Saisir le montant</button></div></div>`;
+
+  if(jour>=Number(D.set.jour_rappel_frais_pro||15) && !proDuMois())
+    h+=`<div class="empty" style="border-color:#4f46e588;color:#a5b4fc;margin-bottom:12px">🧾 On est le ${jour} — as-tu déclaré tes frais pro Generali du mois ?
+    <div class="two" style="margin-top:12px"><button class="btn" onclick="openFraisPro()">Oui, saisir le montant</button><button class="btn" onclick="sansFraisPro()">Pas de frais ce mois-ci</button></div></div>`;
+  if(jour>=Number(D.set.jour_rappel_paie||25) && !paieFaite)
+    h+=`<div class="empty" style="border-color:#f59e0b66;color:var(--orange);margin-bottom:16px">⏰ On est le ${jour} — saisis ta fiche de paie du mois.
+    <div style="margin-top:12px"><button class="btn" onclick="openInc()">Saisir maintenant</button></div></div>`;
+
+  h+=`<h2>Comptes bancaires</h2>
+  <button class="btn" style="margin-bottom:12px" onclick="openAcc()">+ Ajouter un compte</button>`;
+  h+=D.acc.length?D.acc.map(a=>`<div class="row"><div class="ic">🏦</div>
+    <div class="mid"><div class="t">${esc(a.nom)}</div><div class="s">${esc(a.banque||'')} · ${a.exclu_budget?'hors budget perso':(a.source==='ponto'?'synchronisé':'saisi à la main')}</div></div>
+    <div class="amt num ${Number(a.solde)<0?'neg':''}">${eur(Number(a.solde))}</div>
+    <button class="chip" style="padding:5px 9px" onclick="majSolde('${a.id}',${Number(a.solde)})">✎</button>
+    ${D.foyer?`<button class="chip" style="padding:5px 9px" title="${a.foyer_id?'Partagé':'Privé'}" onclick="togglePartage('${a.id}',${a.foyer_id?'true':'false'})">${a.foyer_id?'👥':'🔒'}</button>`:''}</div>`).join('')
+  : `<div class="empty">Ajoute ton compte courant et son solde actuel.</div>`;
+
+  h+=`<h2>Paramètres</h2><div class="card">
+    <label>Objectif d'épargne mensuel</label><input type="number" id="s_ep" value="${Number(D.set.objectif_epargne_mensuel||0)}" step="10">
+    <label>Seuil orange (prudence)</label><input type="number" id="s_or" value="${Number(D.set.seuil_orange??200)}" step="10">
+    <label>Seuil rouge (ça serre)</label><input type="number" id="s_ro" value="${Number(D.set.seuil_rouge??50)}" step="10">
+    <label>Jour de paie / rappel</label><input type="number" id="s_jr" value="${Number(D.set.jour_rappel_paie??25)}" min="1" max="28">
+    <label>Jour du rappel frais pro</label><input type="number" id="s_fp" value="${Number(D.set.jour_rappel_frais_pro??15)}" min="1" max="28">
+    <label>Virement Generali attendu (jours après déclaration)</label><input type="number" id="s_fd" value="${Number(D.set.frais_pro_delai_jours??5)}" min="0" max="30">
+    <label>Tolérance de rapprochement (€)</label><input type="number" id="s_ft" value="${Number(D.set.frais_pro_tolerance??5)}" step="1" min="0">
+    <button class="btn primary" onclick="saveSet()">Enregistrer</button></div>
+
+  <h2>Connexions</h2>
+  <div class="row"><div class="ic">🏦</div><div class="mid"><div class="t">Ponto — flux bancaire</div>
+    <div class="s">${!D.pontoCred ? 'identifiants non renseignés' : (()=>{const d=D.acc.filter(a=>a.derniere_sync).map(a=>new Date(a.derniere_sync)).sort((x,y)=>y-x)[0];
+      return d?`dernière synchro : ${d.toLocaleString('fr-FR',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}`:'connecté, pas encore synchronisé'})()}</div></div>
+    ${D.pontoCred?`<button class="chip" style="padding:6px 11px" onclick="syncPonto(true)">↻</button>`:''}</div>
+  <div class="two" style="margin-top:4px">
+    <button class="btn" onclick="openPonto()">${D.pontoCred?'Changer mes identifiants':'Renseigner mes identifiants'}</button>
+    <button class="btn" onclick="inventairePonto()">Lister mes comptes</button></div>
+  <div class="row"><div class="ic">📬</div><div class="mid"><div class="t">Gmail — factures</div><div class="s">à brancher</div></div></div>
+  <div class="row"><div class="ic">🗄</div><div class="mid"><div class="t">Digiposte — paie & impôts</div><div class="s">à brancher</div></div></div>
+
+  <h2>Foyer${D.foyer?` <span class="count">${esc(D.foyer.nom)}</span>`:''}</h2>`;
+  if(D.foyer){
+    const nomDe=id=>{const p=D.profils.find(x=>x.id===id); return p?(p.full_name||p.email):'Membre'};
+    h+=D.membres.map(m=>`<div class="row"><div class="ic">${m.role==='proprietaire'?'★':'👥'}</div>
+      <div class="mid"><div class="t">${esc(nomDe(m.user_id))}</div><div class="s">${m.role==='proprietaire'?'propriétaire':'membre'}</div></div></div>`).join('');
+    h+=D.invits.map(i=>`<div class="row" style="opacity:.65"><div class="ic">✉</div>
+      <div class="mid"><div class="t">${esc(i.email)}</div><div class="s">invitation en attente — elle rejoindra à sa 1re connexion</div></div></div>`).join('');
+    h+=`<button class="btn" style="margin-top:4px" onclick="openInvit()">+ Inviter quelqu'un</button>
+    <div class="note">Seuls les comptes rattachés au foyer sont partagés. Tes comptes perso restent privés.</div>`;
+  } else {
+    h+=`<div class="empty">Aucun foyer. Crée-en un pour partager un compte avec quelqu'un.
+    <div style="margin-top:12px"><button class="btn" onclick="creerFoyer()">Créer un foyer</button></div></div>`;
+  }
+
+  h+=`<h2>Compte</h2>
+  <div class="row"><div class="ic">👤</div><div class="mid"><div class="t">${esc(U?.email||'')}</div>
+    <div class="s">connecté via ${esc(U?.app_metadata?.provider==='google'?'Google':'e-mail')}</div></div></div>
+  <button class="btn danger" style="margin-top:4px" onclick="logout()">Se déconnecter</button>`;
+  return h;
+}
+
+/* ---------- ACTIONS ---------- */
+async function classe(txId,catId,libelle){
+  const {error}=await SB.from('transactions').update({category_id:catId,statut:'confirmee'}).eq('id',txId);
+  if(error) return toast(error.message);
+  const motif=(libelle||'').toUpperCase().split(/[\s*]+/).filter(w=>w.length>3)[0];
+  if(motif) await SB.from('categorization_rules').upsert({user_id:U.id,category_id:catId,motif},{onConflict:'user_id,motif'});
+  toast('Classé ✓'); load();
+}
+
+function sheet(html,bloquant){
+  const o=document.createElement('div');o.className='ovl';
+  o.innerHTML=`<div class="sheet">${html}</div>`;
+  if(!bloquant) o.onclick=e=>{if(e.target===o)o.remove()};
+  document.body.appendChild(o);return o;
+}
+
+function openAdd(){
+  const o=sheet(`<h3>Nouvelle opération</h3>
+    <label>Libellé</label><input id="a_lib" placeholder="Courses Intermarché">
+    <div class="two"><div><label>Montant (− pour une dépense)</label><input type="number" id="a_mt" step="0.01" inputmode="decimal" placeholder="-42.50"></div>
+    <div><label>Date</label><input type="date" id="a_dt" value="${new Date().toISOString().slice(0,10)}"></div></div>
+    <label>Catégorie</label><select id="a_cat">${D.cats.map(c=>`<option value="${c.id}">${esc(c.nom)}</option>`).join('')}</select>
+    <label>Compte</label><select id="a_acc">${D.acc.map(a=>`<option value="${a.id}">${esc(a.nom)}</option>`).join('')||'<option value="">—</option>'}</select>
+    <button class="btn primary" id="a_go">Enregistrer</button>`);
+  o.querySelector('#a_go').onclick=async()=>{
+    const montant=parseFloat(o.querySelector('#a_mt').value);
+    if(isNaN(montant)) return toast('Montant manquant');
+    const acc=o.querySelector('#a_acc').value||null;
+    const {error}=await SB.from('transactions').insert({user_id:U.id,libelle:o.querySelector('#a_lib').value||'Opération',
+      montant,date_operation:o.querySelector('#a_dt').value,category_id:o.querySelector('#a_cat').value,
+      account_id:acc,statut:'confirmee',source:'manuel'});
+    if(error) return toast(error.message);
+    if(acc){const a=D.acc.find(x=>x.id===acc); if(a) await SB.from('accounts').update({solde:Number(a.solde)+montant}).eq('id',acc)}
+    o.remove(); toast('Ajouté ✓'); load();
+  };
+}
+
+function openRec(){
+  const o=sheet(`<h3>Charge récurrente</h3>
+    <label>Nom</label><input id="r_n" placeholder="Loyer, Netflix, assurance…">
+    <div class="two"><div><label>Montant</label><input type="number" id="r_m" step="0.01" inputmode="decimal"></div>
+    <div><label>Jour (si mensuel)</label><input type="number" id="r_j" min="1" max="31" value="5"></div></div>
+    <label>Fréquence</label><select id="r_f">
+      <option value="mensuel">Mensuel</option><option value="bimestriel">Tous les 2 mois</option>
+      <option value="trimestriel">Trimestriel</option><option value="semestriel">Semestriel</option><option value="annuel">Annuel</option></select>
+    <label>Prochaine échéance (si pas mensuel)</label><input type="date" id="r_e">
+    <label>Catégorie</label><select id="r_c">${D.cats.filter(c=>c.type!=='revenu').map(c=>`<option value="${c.id}">${esc(c.nom)}</option>`).join('')}</select>
+    <label style="display:flex;gap:8px;align-items:center;text-transform:none;font-size:14px;letter-spacing:0"><input type="checkbox" id="r_a" style="width:auto;margin:0"> C'est un abonnement</label>
+    <button class="btn primary" id="r_go">Enregistrer</button>`);
+  o.querySelector('#r_go').onclick=async()=>{
+    const m=parseFloat(o.querySelector('#r_m').value); if(isNaN(m)) return toast('Montant manquant');
+    const f=o.querySelector('#r_f').value, e=o.querySelector('#r_e').value||null;
+    if(f!=='mensuel'&&!e) return toast('Indique la prochaine échéance');
+    const {error}=await SB.from('recurring_charges').insert({user_id:U.id,nom:o.querySelector('#r_n').value||'Charge',montant:m,
+      jour_prelevement:parseInt(o.querySelector('#r_j').value)||1,frequence:f,prochaine_echeance:e,
+      category_id:o.querySelector('#r_c').value,est_abonnement:o.querySelector('#r_a').checked});
+    if(error) return toast(error.message);
+    o.remove(); toast('Charge ajoutée ✓'); load();
+  };
+}
+async function delRec(id,nom){
+  if(!confirm(`Supprimer « ${nom} » ?`)) return;
+  await SB.from('recurring_charges').update({actif:false}).eq('id',id);
+  toast('Supprimée'); load();
+}
+
+function openInc(pro){
+  const o=sheet(`<h3>${pro?'Frais pro Generali':'Revenu du mois'}</h3>
+    ${pro?`<div class="note" style="padding:0 0 12px">Montant remboursé par Generali. Hors budget perso : à virer sur N26 le 18.</div>`:''}
+    <label>Mois concerné</label><input type="month" id="i_m" value="${new Date().toISOString().slice(0,7)}">
+    <label>Montant ${pro?'des frais':'net'}</label><input type="number" id="i_v" step="0.01" inputmode="decimal" placeholder="${pro?'450.00':'2850.00'}">
+    ${pro?'':`<label>Source</label><input id="i_s" value="salaire">
+    <label>Dont commissions (optionnel)</label><input type="number" id="i_c" step="0.01" inputmode="decimal">`}
+    <button class="btn primary" id="i_go">Enregistrer</button>`);
+  o.querySelector('#i_go').onclick=async()=>{
+    const v=parseFloat(o.querySelector('#i_v').value); if(isNaN(v)) return toast('Montant manquant');
+    const com=pro?NaN:parseFloat(o.querySelector('#i_c').value);
+    const {error}=await SB.from('incomes').upsert({user_id:U.id,mois:o.querySelector('#i_m').value+'-01',montant_net:v,
+      source:pro?'frais pro':(o.querySelector('#i_s').value||'salaire'),hors_budget:!!pro,
+      confirme:true,detail:isNaN(com)?null:{commissions:com}},{onConflict:'user_id,mois,source'});
+    if(error) return toast(error.message);
+    o.remove(); toast('Revenu enregistré ✓'); load();
+  };
+}
+
+/* ---------- FRAIS PRO GENERALI ---------- */
+const moisISO = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-01`;
+const proDuMois = m => (D.pro||[]).find(p=>p.mois===(m||moisISO(new Date())));
+let rappelProVu=false, PRO_CONFIRM=[];
+
+// Un seul pop-up a la fois : les rapprochements passent avant le rappel du mois.
+function notifsFraisPro(){
+  if(document.querySelector('.ovl')) return;
+  if(PRO_CONFIRM.length) return confirmerVirementPro();
+  rappelFraisPro();
+}
+
+function rappelFraisPro(){
+  if(rappelProVu) return;
+  const jour=new Date().getDate();
+  if(jour<Number(D.set.jour_rappel_frais_pro||15)) return;
+  if(proDuMois()) return;            // deja repondu pour ce mois : remise a zero le 15 suivant
+  rappelProVu=true;
+  const nm=new Date().toLocaleDateString('fr-FR',{month:'long',year:'numeric'});
+  const o=sheet(`<h3>Frais pro Generali</h3>
+    <div class="note" style="padding:0 0 14px">On est le ${jour}. As-tu déclaré tes frais pro de <b>${nm}</b> ?</div>
+    <button class="btn primary" id="p_o">Oui — saisir le montant</button>
+    <button class="btn" id="p_t" style="margin-top:8px">Pas encore</button>
+    <button class="btn" id="p_s" style="margin-top:8px">Pas de frais ce mois-ci</button>`,true);
+  o.querySelector('#p_o').onclick=()=>{o.remove();openFraisPro()};
+  o.querySelector('#p_t').onclick=()=>{o.remove();toast('Je te le redemande à la prochaine connexion')};
+  o.querySelector('#p_s').onclick=()=>{o.remove();sansFraisPro()};
+}
+
+async function sansFraisPro(){
+  const nm=new Date().toLocaleDateString('fr-FR',{month:'long',year:'numeric'});
+  if(!confirm(`Tu confirmes : aucun frais pro à déclarer pour ${nm} ?`)) return;
+  const {error}=await SB.from('frais_pro').upsert({user_id:U.id,mois:moisISO(new Date()),
+    statut:'sans_frais',montant:null,date_declaration:new Date().toISOString().slice(0,10)},{onConflict:'user_id,mois'});
+  toast(error?error.message:'Noté — rien à déclarer ce mois-ci'); load();
+}
+
+function openFraisPro(mois){
+  const m=mois||moisISO(new Date());
+  const p=proDuMois(m)||{};
+  const d=new Date(); d.setDate(d.getDate()+Number(D.set.frais_pro_delai_jours??5));
+  const o=sheet(`<h3>Frais pro déclarés</h3>
+    <div class="note" style="padding:0 0 12px">Ce montant devient une <b>entrée prévue</b> (virement Generali) dans la projection, puis se rapproche tout seul du virement réel. Le virement vers N26 reste libre : tu le saisiras quand tu le feras.</div>
+    <label>Mois concerné</label><input type="month" id="f_m" value="${m.slice(0,7)}">
+    <label>Montant déclaré</label><input type="number" id="f_v" step="0.01" inputmode="decimal" value="${p.montant??''}" placeholder="450.00">
+    <label>Virement attendu le</label><input type="date" id="f_d" value="${p.date_virement_prevue||d.toISOString().slice(0,10)}">
+    <button class="btn primary" id="f_go">Enregistrer</button>`);
+  o.querySelector('#f_go').onclick=async()=>{
+    const v=parseFloat(o.querySelector('#f_v').value); if(isNaN(v)) return toast('Montant manquant');
+    const {error}=await SB.from('frais_pro').upsert({user_id:U.id,mois:o.querySelector('#f_m').value+'-01',
+      statut:'declare',montant:v,date_declaration:new Date().toISOString().slice(0,10),
+      date_virement_prevue:o.querySelector('#f_d').value||null,
+      transaction_id:null,montant_recu:null,rapproche_le:null},{onConflict:'user_id,mois'});
+    if(error) return toast(error.message);
+    o.remove(); toast('Frais pro enregistrés ✓'); load();
+  };
+}
+
+function openVirN26(id){
+  const p=(D.pro||[]).find(x=>x.id===id); if(!p) return;
+  const recu=Number(p.montant_recu||p.montant||0);
+  const o=sheet(`<h3>Virement vers N26</h3>
+    <div class="note" style="padding:0 0 12px">Remboursement reçu : <b>${eur(recu)}</b>. Tu vires ce que tes liquidités permettent — le reste n'est pas perdu, il reste sur le compte perso.</div>
+    <label>Montant viré sur N26</label><input type="number" id="n_v" step="0.01" inputmode="decimal" value="${recu||''}">
+    <label>Date du virement</label><input type="date" id="n_d" value="${new Date().toISOString().slice(0,10)}">
+    <button class="btn primary" id="n_go">Enregistrer</button>`);
+  o.querySelector('#n_go').onclick=async()=>{
+    const v=parseFloat(o.querySelector('#n_v').value); if(isNaN(v)) return toast('Montant manquant');
+    const {error}=await SB.from('frais_pro').update({montant_vire_n26:v,
+      date_virement_n26:o.querySelector('#n_d').value||new Date().toISOString().slice(0,10)}).eq('id',id);
+    if(error) return toast(error.message);
+    o.remove(); toast('Virement noté ✓'); load();
+  };
+}
+
+// Rapprochement du virement Generali recu avec le montant declare.
+// Ecart <= tolerance : automatique. Au-dela : on demande confirmation.
+async function rapprocherFraisPro(){
+  PRO_CONFIRM=[];
+  if(!U||!(D.pro||[]).length) return false;
+  const tol=Number(D.set.frais_pro_tolerance??5);
+  const persos=new Set(D.acc.filter(a=>!a.exclu_budget).map(a=>a.id));
+  const lies=new Set(D.pro.map(p=>p.transaction_id).filter(Boolean));
+  let maj=false;
+  for(const p of D.pro){
+    if(p.statut!=='declare'||!p.montant||p.transaction_id) continue;
+    const ref=new Date((p.date_virement_prevue||p.date_declaration)+'T00:00:00');
+    const ecartees=new Set(p.tx_ecartees||[]);
+    const c=D.tx.filter(t=>Number(t.montant)>0 && !lies.has(t.id) && !ecartees.has(t.id)
+        && (!t.account_id||persos.has(t.account_id))
+        && Math.abs(new Date(t.date_operation+'T00:00:00')-ref)<=10*864e5
+        && Number(t.montant)<=Number(p.montant)*2.5)
+      .map(t=>({t,diff:Math.abs(Number(t.montant)-Number(p.montant)),
+                gen:/generali/i.test((t.libelle||'')+' '+(t.contrepartie||''))?1:0}))
+      .sort((a,b)=>(b.gen-a.gen)||(a.diff-b.diff));
+    if(!c.length) continue;
+    const best=c[0];
+    if(best.diff<=tol){
+      const {error}=await SB.from('frais_pro').update({statut:'recu',transaction_id:best.t.id,
+        montant_recu:Number(best.t.montant),rapproche_le:new Date().toISOString()}).eq('id',p.id);
+      if(!error){ maj=true; lies.add(best.t.id) }
+    }else{
+      PRO_CONFIRM.push({pro:p,tx:best.t});
+    }
+  }
+  return maj;
+}
+
+function confirmerVirementPro(){
+  const item=PRO_CONFIRM.shift(); if(!item) return;
+  const {pro,tx}=item;
+  const nm=new Date(pro.mois+'T00:00:00').toLocaleDateString('fr-FR',{month:'long'});
+  const o=sheet(`<h3>Virement à rapprocher</h3>
+    <div class="note" style="padding:0 0 12px">Tu avais déclaré <b>${eur(Number(pro.montant))}</b> de frais pro pour ${nm}. Ce virement correspond-il ? L'écart est de ${eur(Math.abs(Number(tx.montant)-Number(pro.montant)))}.</div>
+    <div class="row"><div class="ic">💰</div><div class="mid"><div class="t">${esc(tx.libelle)}</div>
+      <div class="s">${new Date(tx.date_operation+'T00:00:00').toLocaleDateString('fr-FR',{day:'numeric',month:'long'})}</div></div>
+      <div class="amt pos">${eur(Number(tx.montant))}</div></div>
+    <button class="btn primary" id="v_o" style="margin-top:14px">Oui, c'est le remboursement</button>
+    <button class="btn" id="v_n" style="margin-top:8px">Non, rien à voir</button>`,true);
+  o.querySelector('#v_o').onclick=async()=>{
+    const {error}=await SB.from('frais_pro').update({statut:'recu',transaction_id:tx.id,
+      montant_recu:Number(tx.montant),rapproche_le:new Date().toISOString()}).eq('id',pro.id);
+    o.remove(); toast(error?error.message:'Rapproché ✓'); load();
+  };
+  o.querySelector('#v_n').onclick=async()=>{
+    const {error}=await SB.from('frais_pro').update({tx_ecartees:[...(pro.tx_ecartees||[]),tx.id]}).eq('id',pro.id);
+    o.remove(); if(error) toast(error.message); load();
+  };
+}
+
+function openAcc(){
+  const o=sheet(`<h3>Nouveau compte</h3>
+    <label>Nom</label><input id="c_n" placeholder="Compte courant">
+    <label>Banque</label><input id="c_b" placeholder="Société Générale">
+    <div class="two"><div><label>Solde actuel</label><input type="number" id="c_s" step="0.01" inputmode="decimal"></div>
+    <div><label>Type</label><select id="c_t"><option value="courant">Courant</option><option value="epargne">Épargne</option></select></div></div>
+    <label style="display:flex;gap:8px;align-items:center;text-transform:none;font-size:14px;letter-spacing:0"><input type="checkbox" id="c_x" style="width:auto;margin:0"> Hors budget perso (compte pro)</label>
+    <button class="btn primary" id="c_go">Enregistrer</button>`);
+  o.querySelector('#c_go').onclick=async()=>{
+    const {error}=await SB.from('accounts').insert({user_id:U.id,nom:o.querySelector('#c_n').value||'Compte',
+      banque:o.querySelector('#c_b').value,solde:parseFloat(o.querySelector('#c_s').value)||0,
+      type:o.querySelector('#c_t').value,exclu_budget:o.querySelector('#c_x').checked});
+    if(error) return toast(error.message);
+    o.remove(); toast('Compte ajouté ✓'); load();
+  };
+}
+function openPonto(){
+  const o=sheet(`<h3>Identifiants Ponto</h3>
+    <div class="note" style="padding:0 0 12px">Ceux de <b>ton</b> intégration Ponto, à toi seul. Ils sont enregistrés côté serveur et ne sont jamais relus par le navigateur — si tu les perds, régénère le secret dans Ponto.</div>
+    <label>Client ID</label><input id="pk_i" autocomplete="off" spellcheck="false">
+    <label>Client Secret</label><input id="pk_s" type="password" autocomplete="new-password" spellcheck="false">
+    <button class="btn primary" id="pk_go">Enregistrer</button>`);
+  o.querySelector('#pk_go').onclick=async()=>{
+    const ci=o.querySelector('#pk_i').value.trim(), cs=o.querySelector('#pk_s').value.trim();
+    if(!ci||!cs) return toast('Les deux champs sont nécessaires');
+    const {error}=await SB.rpc('enregistrer_ponto',{p_client_id:ci,p_client_secret:cs});
+    if(error) return toast(error.message);
+    o.remove(); toast('Identifiants enregistrés ✓'); load();
+  };
+}
+
+function openImpots(){
+  const an=new Date().getFullYear();
+  const o=sheet(`<h3>Régularisation d'impôt</h3>
+    <div class="note" style="padding:0 0 12px">Le solde est prélevé de septembre à décembre. Donne le montant <b>mensuel</b> indiqué sur ton avis, ou le total : je répartis.</div>
+    <label>Montant mensuel</label><input type="number" id="im_m" step="0.01" inputmode="decimal" placeholder="223.00">
+    <label>Jour de prélèvement</label><input type="number" id="im_j" min="1" max="28" value="24">
+    <label>Compte prélevé</label><select id="im_a">${D.acc.map(a=>`<option value="${a.id}">${esc(a.nom)}</option>`).join('')}</select>
+    <button class="btn primary" id="im_go">Enregistrer</button>
+    <button class="btn" id="im_no" style="margin-top:8px">Rien à payer cette année</button>`);
+  o.querySelector('#im_go').onclick=async()=>{
+    const m=parseFloat(o.querySelector('#im_m').value); if(isNaN(m)) return toast('Montant manquant');
+    const {error}=await SB.from('recurring_charges').insert({
+      user_id:U.id, account_id:o.querySelector('#im_a').value,
+      category_id:(D.cats.find(c=>c.nom==='Divers')||{}).id,
+      nom:`Solde impôt revenus ${an-1} (sept.–déc.)`, montant:m, frequence:'mensuel',
+      jour_prelevement:parseInt(o.querySelector('#im_j').value)||24,
+      prochaine_echeance:`${an}-09-01`, date_fin:`${an}-12-31`});
+    if(error) return toast(error.message);
+    o.remove(); toast('Échéances enregistrées ✓'); load();
+  };
+  o.querySelector('#im_no').onclick=async()=>{
+    await SB.from('settings').upsert({user_id:U.id,impots_traites_an:an},{onConflict:'user_id'});
+    o.remove(); toast('Noté'); load();
+  };
+}
+
+async function inventairePonto(){
+  const {data:{session}} = await SB.auth.getSession();
+  if(!session) return toast('Session expirée');
+  toast('Interrogation de Ponto…');
+  const r = await fetch('https://rjnysyddgpcjzmfbpyba.supabase.co/functions/v1/ponto-sync',{
+    method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${session.access_token}`},
+    body:JSON.stringify({lister:true})});
+  const j = await r.json().catch(()=>({error:'Réponse illisible'}));
+  const txt = JSON.stringify(j,null,2);
+  const o = sheet(`<h3>Comptes Ponto</h3>
+    <div class="note" style="padding:0 0 10px">Rien n'a été écrit en base. Copie ce texte et envoie-le dans la conversation.</div>
+    <textarea id="inv" readonly style="width:100%;height:46vh;padding:12px;border-radius:12px;border:1px solid var(--line);background:var(--panel2);color:var(--txt);font:500 12px 'JetBrains Mono',monospace">${esc(txt)}</textarea>
+    <button class="btn primary" id="cp">Copier</button>`);
+  o.querySelector('#cp').onclick=()=>{
+    const t=o.querySelector('#inv'); t.select();
+    navigator.clipboard?.writeText(t.value).then(()=>toast('Copié ✓'),()=>document.execCommand('copy'));
+  };
+}
+
+let syncEnCours=false;
+async function syncPonto(forcer){
+  if(syncEnCours) return;
+  syncEnCours=true;
+  if(forcer) toast('Synchronisation en cours…');
+  try{
+    const {data:{session}} = await SB.auth.getSession();
+    if(!session) return;
+    const r = await fetch('https://rjnysyddgpcjzmfbpyba.supabase.co/functions/v1/ponto-sync',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':`Bearer ${session.access_token}`},
+      body:JSON.stringify({forcer:!!forcer})
+    });
+    const j = await r.json().catch(()=>({error:'Réponse illisible'}));
+    if(j.error){ if(forcer) toast(j.error.slice(0,110)); return }
+    if(forcer) toast(`${j.comptes} compte(s), ${j.transactions} opération(s)${j.a_valider?` · ${j.a_valider} à confirmer`:''}`);
+    await load();
+  }catch(e){ if(forcer) toast('Synchro impossible : '+String(e.message||e).slice(0,80)) }
+  finally{ syncEnCours=false }
+}
+
+async function togglePartage(id,partage){
+  const {error}=await SB.from('accounts').update({foyer_id:partage?null:D.foyer.id}).eq('id',id);
+  if(error) return toast(error.message);
+  toast(partage?'Compte repassé en privé':'Compte partagé avec le foyer'); load();
+}
+function openInvit(){
+  const o=sheet(`<h3>Inviter au foyer</h3>
+    <div class="note" style="padding:0 0 12px">La personne rejoindra le foyer à sa première connexion avec cette adresse. Elle verra uniquement les comptes rattachés au foyer.</div>
+    <label>Adresse e-mail</label><input type="email" id="v_e" placeholder="prenom@gmail.com">
+    <button class="btn primary" id="v_go">Envoyer l'invitation</button>`);
+  o.querySelector('#v_go').onclick=async()=>{
+    const e=o.querySelector('#v_e').value.trim(); if(!e) return toast('E-mail manquant');
+    const {error}=await SB.from('foyer_invitations').insert({foyer_id:D.foyer.id,email:e});
+    if(error) return toast(error.message);
+    o.remove(); toast('Invitation créée ✓'); load();
+  };
+}
+async function creerFoyer(){
+  const nom=prompt('Nom du foyer :','Mon foyer'); if(!nom) return;
+  const {data,error}=await SB.from('foyers').insert({nom,created_by:U.id}).select().single();
+  if(error) return toast(error.message);
+  await SB.from('foyer_membres').insert({foyer_id:data.id,user_id:U.id,role:'proprietaire'});
+  toast('Foyer créé ✓'); load();
+}
+async function majSolde(id,cur){
+  const v=prompt('Solde actuel du compte :',cur); if(v===null) return;
+  const n=parseFloat(String(v).replace(',','.')); if(isNaN(n)) return toast('Montant invalide');
+  await SB.from('accounts').update({solde:n}).eq('id',id); toast('Solde mis à jour ✓'); load();
+}
+async function saveSet(){
+  const {error}=await SB.from('settings').upsert({user_id:U.id,
+    objectif_epargne_mensuel:parseFloat(document.getElementById('s_ep').value)||0,
+    seuil_orange:parseFloat(document.getElementById('s_or').value)||0,
+    seuil_rouge:parseFloat(document.getElementById('s_ro').value)||0,
+    jour_rappel_paie:parseInt(document.getElementById('s_jr').value)||25,
+    jour_rappel_frais_pro:parseInt(document.getElementById('s_fp').value)||15,
+    frais_pro_delai_jours:parseInt(document.getElementById('s_fd').value)||0,
+    frais_pro_tolerance:parseFloat(document.getElementById('s_ft').value)||0},{onConflict:'user_id'});
+  toast(error?error.message:'Enregistré ✓'); load();
+}
+
+/* ---------- BOOT ---------- */
+SB.auth.onAuthStateChange(async(_e,s)=>{
+  U=s?.user||null;
+  if(U){
+    document.getElementById('login').classList.add('hidden');
+    document.getElementById('app').classList.remove('hidden');
+    await load();
+    // Resynchronisation à l'ouverture, seulement si l'utilisateur a configuré son Ponto
+    if(D.pontoCred) syncPonto(true);
+  }else{
+    document.getElementById('login').classList.remove('hidden');
+    document.getElementById('app').classList.add('hidden');
+  }
+});
+SB.auth.getSession();
+</script>
+</body>
+</html>

@@ -328,9 +328,9 @@ function moteur(){
   const now=new Date(), Y=now.getFullYear(), M=now.getMonth(), today=now.getDate();
   const aujourdhui=new Date(Y,M,today);
   const finMois=new Date(Y,M+1,0);
-  const HORIZON=60;                                  // on projette 60 jours : la fin du mois seule ne veut rien dire
-  const fin=new Date(Y,M,today+HORIZON-1);
   const joursRestants=finMois.getDate()-today+1;
+  const HORIZON=joursRestants;                       // on projette jusqu'a la fin du mois en cours
+  const fin=new Date(Y,M,today+HORIZON-1);
 
   const solde=D.acc.filter(a=>a.type==='courant'&&!a.exclu_budget).reduce((s,a)=>s+Number(a.solde),0);
 
@@ -475,7 +475,6 @@ function vHome(){
     <div class="card"><div class="k">À sortir d'ici le ${dernier}</div><div class="v num neg">${eur0(m.totalAVenirMois)}</div><div class="n">${m.aVenirMois.length} échéance${m.aVenirMois.length>1?'s':''}</div></div>
     <div class="card"><div class="k">À rentrer d'ici le ${dernier}</div><div class="v num pos">${eur0(m.inflows.filter(e=>e.date<=m.finMois).reduce((s,e)=>s+e.montant,0))}</div><div class="n">${m.prochaine?`prochaine le ${m.prochaine.date.toLocaleDateString('fr-FR',{day:'numeric',month:'short'})}`:'rien d\'identifié'}</div></div>
     <div class="card"><div class="k">Solde projeté au ${dernier}</div><div class="v num" style="color:${m.finMoisBal<0?'var(--red)':'var(--txt)'}">${eur0(m.finMoisBal)}</div><div class="n">entrées, charges et train de vie compris</div></div>
-    <div class="card"><div class="k">Dans ${m.HORIZON} jours</div><div class="v num" style="color:${m.finHorizonBal<0?'var(--red)':'var(--txt)'}">${eur0(m.finHorizonBal)}</div><div class="n">au ${m.fin.toLocaleDateString('fr-FR',{day:'numeric',month:'short'})}</div></div>
     <div class="card"><div class="k">Charges fixes</div><div class="v num">${eur0(m.chargesMois)}</div><div class="n">moyenne lissée / mois</div></div>
   </div>`;
 
@@ -496,7 +495,7 @@ function vHome(){
     });
   }
 
-  h+=`<h2>Les ${m.HORIZON} prochains jours <span class="count">${m.negPrevu?'⚠ passage en négatif':'jamais en négatif'}</span></h2><div class="chartbox"><div id="chart"></div></div>`;
+  h+=`<h2>D'ici le ${dernier} <span class="count">${m.negPrevu?'⚠ passage en négatif':'jamais en négatif'}</span></h2><div class="chartbox"><div id="chart"></div></div>`;
   if(!m.quotidien) h+=`<div class="note">Les dépenses du quotidien ne sont pas encore estimées : la courbe ne tient compte que des charges connues.</div>`;
 
   h+=`<h2>Ce qui tombe bientôt <span class="count">${eur0(m.totalAVenirMois)}</span></h2>`;

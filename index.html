@@ -117,8 +117,12 @@ async function google(){
 async function magic(){
   const email = document.getElementById('mail').value.trim();
   if(!email) return toast('Entre ton e-mail');
-  const {error} = await SB.auth.signInWithOtp({email,options:{emailRedirectTo:location.origin}});
-  toast(error ? error.message : 'Lien envoyé ! Regarde ta boîte mail.');
+  // shouldCreateUser:false — aucune inscription depuis l'appli : seuls les comptes
+  // deja crees dans Supabase peuvent demander un lien de connexion.
+  const {error} = await SB.auth.signInWithOtp({email,options:{emailRedirectTo:location.origin,shouldCreateUser:false}});
+  if(error) return toast(/not allowed|signups not allowed|Signups not allowed/i.test(error.message)
+    ? "Cette adresse n'a pas de compte sur l'appli." : error.message);
+  toast('Lien envoyé ! Regarde ta boîte mail.');
 }
 async function logout(){ await SB.auth.signOut(); location.reload() }
 

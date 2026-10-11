@@ -3,14 +3,18 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src https://rjnysyddgpcjzmfbpyba.supabase.co wss://rjnysyddgpcjzmfbpyba.supabase.co; base-uri 'none'; form-action 'none'; object-src 'none'; frame-src 'none'">
 <title>Trésorerie</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%230D0F12'/><path d='M6 23a10 10 0 0 1 20 0' fill='none' stroke='%23262B33' stroke-width='3.6' stroke-linecap='round'/><path d='M6 23a10 10 0 0 1 14.5-8.9' fill='none' stroke='%23D4F25C' stroke-width='3.6' stroke-linecap='round'/></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@500;600&display=swap" rel="stylesheet">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<link rel="stylesheet" href="styles.css?v=10">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.3"></script>
+<link rel="stylesheet" href="styles.css?v=11">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-title" content="Trésorerie">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 </head>
 <body>
 
@@ -61,7 +65,7 @@ const TITRES={home:'Pilotage',flux:'Mouvements',fixe:'Charges & revenus',set:'R�
 const eur = n => (n<0?'-':'')+Math.abs(n).toLocaleString('fr-FR',{minimumFractionDigits:2,maximumFractionDigits:2})+' €';
 const eur0 = n => (n<0?'-':'')+Math.abs(Math.round(n)).toLocaleString('fr-FR')+' €';
 const esc = s => String(s==null?'':s).replace(/[<>&"]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));
-const jsq = s => String(s==null?'':s).replace(/\\/g,'\\\\').replace(/'/g,"\\'");
+const jsq = s => String(s==null?'':s).replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 const PERIODE={hebdomadaire:'par semaine',mensuel:'par mois',bimestriel:'tous les 2 mois',trimestriel:'par trimestre',semestriel:'par semestre',annuel:'par an'};
 const PAR_AN={hebdomadaire:52,mensuel:12,bimestriel:6,trimestriel:4,semestriel:2,annuel:1};
 const parMois = r => Number(r.montant)*(PAR_AN[r.frequence]||12)/12;

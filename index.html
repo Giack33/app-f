@@ -337,7 +337,12 @@ function moteur(){
   const HORIZON=joursRestants;                       // on projette jusqu'a la fin du mois en cours
   const fin=new Date(Y,M,today+HORIZON-1);
 
-  const solde=D.acc.filter(a=>a.type==='courant'&&!a.exclu_budget).reduce((s,a)=>s+Number(a.solde),0);
+  const courants=D.acc.filter(a=>a.type==='courant'&&!a.exclu_budget);
+  const solde=courants.reduce((s,a)=>s+Number(a.solde),0);
+  // on sépare ce qui est rattaché au foyer (commun) de ce qui ne l'est pas (perso)
+  const comptesCommuns=courants.filter(a=>a.foyer_id), comptesPersos=courants.filter(a=>!a.foyer_id);
+  const soldeCommun=comptesCommuns.reduce((s,a)=>s+Number(a.solde),0);
+  const soldePerso=comptesPersos.reduce((s,a)=>s+Number(a.solde),0);
 
   // ce qui tombe encore d'ici la fin du mois, toutes fréquences confondues
   const aVenir=[];
@@ -436,7 +441,7 @@ function moteur(){
   const finHorizonBal=proj.length?proj[proj.length-1].bal:solde;
   const negPrevu=proj.find(x=>x.bal<0)||null;
 
-  return {solde,totalAVenir,epRestante,reste,hebdo,parJour,couleur,verdict,joursRestants,finMois,finMoisBal,
+  return {solde,soldeCommun,soldePerso,comptesCommuns,comptesPersos,totalAVenir,epRestante,reste,hebdo,parJour,couleur,verdict,joursRestants,finMois,finMoisBal,
           HORIZON,fin,finHorizonBal,inflows,totalEntrees,prochaine,joursAvantEntree,aVenirMois,totalAVenirMois,negPrevu,
           parCat,parCatPrec,depMois,proj,aVenir,revMoy,quotidien,proPrevus,totalProPrevu,proRecu,
           aValider:D.tx.filter(t=>t.statut==='a_valider'),
@@ -528,7 +533,8 @@ function vHome(){
   </div>
   <div class="grid">
     <div class="card"><div class="k">Budget semaine</div><div class="v num" style="color:${m.couleur}">${eur0(m.hebdo)}</div><div class="n">${eur0(m.parJour)} par jour</div></div>
-    <div class="card"><div class="k">Solde réel</div><div class="v num">${eur0(m.solde)}</div><div class="n">${D.acc.filter(a=>!a.exclu_budget).length} compte(s) perso</div></div>
+    <div class="card"><div class="k">Solde commun</div><div class="v num">${eur0(m.soldeCommun)}</div><div class="n">${m.comptesCommuns.length?m.comptesCommuns.map(a=>esc(a.nom)).join(' · '):'aucun compte partagé'}</div></div>
+    <div class="card"><div class="k">Solde perso</div><div class="v num">${eur0(m.soldePerso)}</div><div class="n">${m.comptesPersos.length?m.comptesPersos.map(a=>esc(a.nom)).join(' · '):'aucun compte perso'}</div></div>
     <div class="card"><div class="k">À sortir d'ici le ${dernier}</div><div class="v num neg">${eur0(m.totalAVenirMois)}</div><div class="n">${m.aVenirMois.length} échéance${m.aVenirMois.length>1?'s':''}</div></div>
     <div class="card"><div class="k">À rentrer d'ici le ${dernier}</div><div class="v num pos">${eur0(m.inflows.filter(e=>e.date<=m.finMois).reduce((s,e)=>s+e.montant,0))}</div><div class="n">${m.prochaine?`prochaine le ${m.prochaine.date.toLocaleDateString('fr-FR',{day:'numeric',month:'short'})}`:'rien d\'identifié'}</div></div>
     <div class="card"><div class="k">Solde projeté au ${dernier}</div><div class="v num" style="color:${m.finMoisBal<0?'var(--red)':'var(--txt)'}">${eur0(m.finMoisBal)}</div><div class="n">entrées, charges et train de vie compris</div></div>

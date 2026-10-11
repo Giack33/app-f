@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<link rel="stylesheet" href="styles.css?v=7">
+<link rel="stylesheet" href="styles.css?v=8">
 </head>
 <body>
 
@@ -65,10 +65,9 @@ const PERIODE={hebdomadaire:'par semaine',mensuel:'par mois',bimestriel:'tous le
 const PAR_AN={hebdomadaire:52,mensuel:12,bimestriel:6,trimestriel:4,semestriel:2,annuel:1};
 const parMois = r => Number(r.montant)*(PAR_AN[r.frequence]||12)/12;
 
-// --- Couleur d'origine : chaque compte a sa teinte, pour reperer d'ou vient l'operation ---
-const ACC_PAL=['#7DB8FF','#C9A2FF','#5ED6C1','#A9B4FF','#D4F25C'];
-const accIdx = id => [...D.acc].map(a=>a.id).sort().indexOf(id);   // ordre stable : la couleur ne bouge pas d'une session a l'autre
-const accCol = id => { const i=accIdx(id); return i<0?'#6F7882':ACC_PAL[i%ACC_PAL.length] };
+// --- Couleur d'origine : 2 teintes seulement, compte commun (foyer) vs compte perso ---
+const COL_COMMUN='#7DB8FF', COL_PERSO='#C9A2FF';
+const accCol = id => { const a=D.acc.find(x=>x.id===id); return !a?'#6F7882':(a.foyer_id?COL_COMMUN:COL_PERSO) };
 const accNom = id => { const a=D.acc.find(x=>x.id===id); return a?a.nom:'' };
 
 const ICP={
@@ -806,8 +805,8 @@ function vFlux(){
   </div>
   <div class="seg" id="fseg">${SEG.map(([k,l])=>
     `<button data-f="${k}" class="${FLUX.f===k?'on':''}" onclick="FLUX.f='${k}';renderFlux()">${l}</button>`).join('')}</div>
-  ${D.acc.length>1?`<div class="acclg">`+[...D.acc].sort((x,y)=>x.id.localeCompare(y.id))
-      .map(a=>`<span><i style="background:${accCol(a.id)}"></i>${esc(a.nom)}</span>`).join('')+`</div>`:''}
+  <div class="acclg"><span><i style="background:${COL_COMMUN}"></i>compte commun</span>
+    <span><i style="background:${COL_PERSO}"></i>compte perso</span></div>
   <div id="fluxlist"></div>`;
   return h;
 }

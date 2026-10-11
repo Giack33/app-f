@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<link rel="stylesheet" href="styles.css?v=8">
+<link rel="stylesheet" href="styles.css?v=9">
 </head>
 <body>
 
@@ -605,7 +605,7 @@ function vHome(){
     m.aValider.slice(0,6).forEach(t=>{
       h+=`<div class="valid"><div class="top">
           <div style="min-width:0"><div class="t">${esc(t.libelle)}</div>
-          <div class="s">${new Date(t.date_operation+'T00:00:00').toLocaleDateString('fr-FR',{day:'numeric',month:'long'})}</div></div>
+          <div class="s">${new Date(t.date_operation+'T00:00:00').toLocaleDateString('fr-FR',{day:'numeric',month:'long'})}${accNom(t.account_id)?` · <span style="color:${accCol(t.account_id)}">${esc(accNom(t.account_id))}</span>`:''}</div></div>
           <div class="amt ${Number(t.montant)<0?'neg':'pos'}" style="font-size:19px">${eur(Number(t.montant))}</div></div>
         <div class="chips">${D.cats.filter(c=>c.type!=='revenu').map(c=>
           `<button class="chip" onclick="classe('${t.id}','${c.id}','${jsq(t.libelle)}')"><b style="background:${c.couleur||'#9BA3AD'}"></b>${esc(c.nom)}</button>`).join('')}</div></div>`;
@@ -1062,7 +1062,9 @@ function openDepMois(cat){
   const tot=ops.reduce((s,t)=>s+Math.abs(Number(t.montant)),0);
   const mois=new Date().toLocaleDateString('fr-FR',{month:'long',year:'numeric'});
   let h=`<h3>${cat?esc(cat):'Dépenses du mois'} <span class="count">${eur0(tot)}</span></h3>
-    <div class="over" style="margin:-8px 0 14px;color:var(--faint)">${ops.length} opération${ops.length>1?'s':''} · ${mois}</div>`;
+    <div class="over" style="margin:-8px 0 10px;color:var(--faint)">${ops.length} opération${ops.length>1?'s':''} · ${mois}</div>
+    <div class="acclg" style="margin-bottom:12px"><span><i style="background:${COL_COMMUN}"></i>compte commun</span>
+      <span><i style="background:${COL_PERSO}"></i>compte perso</span></div>`;
   if(!ops.length){ sheet(h+`<div class="empty">Aucune dépense ce mois-ci.</div>`); return }
   let jour='';
   ops.forEach((t,k)=>{
@@ -1070,9 +1072,11 @@ function openDepMois(cat){
     if(j!==jour){ h+=`${jour?'</div>':''}<div class="dayhead"><div class="over">${j}</div></div><div class="list">`; jour=j }
     const c=D.catById[t.category_id], a=D.acc.find(x=>x.id===t.account_id);
     const acl=t.statut==='a_valider'||!c;
-    h+=`<div class="row"><div class="ic" style="background:${acl?'var(--amber-bg)':(c.couleur?c.couleur+'22':'var(--panel2)')};color:${acl?'var(--amber)':(c.couleur||'var(--muted)')}">${acl?ic('quest',18):esc((c.nom||'?').trim().charAt(0).toUpperCase())}</div>
+    const ac=accCol(t.account_id), an=a?a.nom:'';
+    h+=`<div class="row"><i class="accstripe" style="background:${ac}" title="${esc(an)}"></i>
+      <div class="ic" style="background:${acl?'var(--amber-bg)':(c.couleur?c.couleur+'22':'var(--panel2)')};color:${acl?'var(--amber)':(c.couleur||'var(--muted)')}">${acl?ic('quest',18):esc((c.nom||'?').trim().charAt(0).toUpperCase())}</div>
       <div class="mid"><div class="t">${esc(t.libelle)}</div>
-      <div class="s">${cat?(a?esc(a.nom):'—'):(acl?'à classer':esc(c.nom))}</div></div>
+      <div class="s">${acl?'<b style="color:var(--amber);font-weight:600">à classer</b>':esc(c.nom)}${an?` · <span style="color:${ac}">${esc(an)}</span>`:''}</div></div>
       <div class="amt neg">${eur(Number(t.montant))}</div></div>`;
   });
   sheet(h+'</div>');

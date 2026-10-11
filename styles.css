@@ -168,9 +168,6 @@ h2 .count{background:var(--panel2);color:var(--txt);border-radius:999px;padding:
 .banner.pro{background:#171A2A;border-color:#343A66}
 .banner.pro .bic{background:var(--indigo-bg);color:var(--indigo)}
 .banner.pro .ba button{background:var(--indigo);color:var(--bg)}
-.banner.pay{background:#221C0F;border-color:#4E3E17}
-.banner.pay .bic{background:var(--amber-bg);color:var(--amber)}
-.banner.pay .ba button{background:var(--amber);color:var(--bg)}
 
 /* ---------- CHART ---------- */
 

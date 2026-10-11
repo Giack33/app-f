@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.3"></script>
-<link rel="stylesheet" href="styles.css?v=12">
+<link rel="stylesheet" href="styles.css?v=13">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta name="apple-mobile-web-app-title" content="Trésorerie">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -102,8 +102,7 @@ const ICP={
   out:'<path d="M12 21V9M12 9 8 13M12 9l4 4"/><path d="M4 5h16"/>',
   case:'<rect x="2" y="7" width="20" height="14" rx="2.5"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M2 13h20"/>',
   receipt:'<path d="M5 3h14v18l-3-2-2 2-2-2-2 2-3-2z"/><path d="M9 8h6M9 12h6"/>',
-  mail:'<rect x="2" y="4" width="20" height="16" rx="3"/><path d="M3 6l9 7 9-7"/>',
-  doc:'<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/>'
+  mail:'<rect x="2" y="4" width="20" height="16" rx="3"/><path d="M3 6l9 7 9-7"/>'
 };
 const ic=(n,s=20)=>`<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICP[n]||''}</svg>`;
 
@@ -866,8 +865,6 @@ function vFixe(){
 
 function vSet(){
   const jour=new Date().getDate();
-  const moisCourant=new Date().toISOString().slice(0,7)+'-01';
-  const paieFaite=D.inc.some(i=>i.mois===moisCourant);
   let h=hd('Configuration','Réglages');
   const an=new Date().getFullYear(), moisImpots=Number(D.set.mois_rappel_impots||7);
   const impotsFait=D.rec.some(r=>r.nom.includes(`revenus ${an-1}`)) ||
@@ -884,11 +881,6 @@ function vSet(){
       <div class="bs">On est le ${jour} — as-tu déclaré tes frais ?</div>
       <div class="ba"><button onclick="openFraisPro()">Oui, saisir le montant</button>
       <button onclick="sansFraisPro()" style="background:var(--panel2);color:var(--txt)">Pas de frais</button></div></div></div>`;
-  if(jour>=Number(D.set.jour_rappel_paie||25) && !paieFaite)
-    h+=`<div class="banner pay"><div class="bic">${ic('clock',20)}</div>
-      <div style="min-width:0"><div class="bt">Fiche de paie</div>
-      <div class="bs">On est le ${jour} — saisis ta paie du mois pour recaler la projection.</div>
-      <div class="ba"><button onclick="openInc()">Saisir maintenant</button></div></div></div>`;
 
   const totSoldes=D.acc.reduce((s,a)=>s+Number(a.solde),0);
   const abr=a=>String(a.banque||a.nom||'?').replace(/[^A-Za-zÀ-ÿ0-9]/g,'').slice(0,3).toUpperCase();
@@ -921,13 +913,7 @@ function vSet(){
       <div class="s">${!D.pontoCred ? 'aucune intégration rattachée à ce compte' : (()=>{const d=D.acc.filter(a=>a.derniere_sync).map(a=>new Date(a.derniere_sync)).sort((x,y)=>y-x)[0];
         return d?`dernière synchro : ${d.toLocaleString('fr-FR',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}`:'connecté, pas encore synchronisé'})()}</div></div>
       ${D.pontoCred?`<button class="mini" onclick="syncPonto(true)" aria-label="Synchroniser maintenant" style="border-radius:50%">${ic('sync',15)}</button>`:''}</div>
-    <div class="row"><div class="ic" style="background:var(--panel2);color:var(--muted)">${ic('mail',18)}</div>
-      <div class="mid"><div class="t">Gmail — factures</div><div class="s">à brancher</div></div></div>
-    <div class="row"><div class="ic" style="background:var(--panel2);color:var(--muted)">${ic('doc',18)}</div>
-      <div class="mid"><div class="t">Digiposte — paie & impôts</div><div class="s">à brancher</div></div></div>
   </div>
-  <div style="margin-top:10px">
-    <button class="btn" onclick="inventairePonto()">Lister mes comptes</button></div>
 
   <h2>Foyer${D.foyer?` <span class="count">${esc(D.foyer.nom)}</span>`:''}</h2>`;
   if(D.foyer){
@@ -1253,34 +1239,17 @@ function openInc(pro){
     <div class="card" style="text-align:center;padding:18px 16px 16px;margin-bottom:14px">
       <div class="over">Montant ${pro?'des frais':'net'}</div>
       <input type="number" id="i_v" class="bigin" step="0.01" inputmode="decimal" placeholder="0,00" style="font-size:48px;color:${pro?'var(--indigo)':'var(--lime)'}">
-      ${pro?'':`<div class="stack" id="i_bar" style="margin:4px 0 8px"><i style="width:100%;background:var(--lime)"></i></div>
-      <div class="legend" style="grid-template-columns:1fr 1fr"><div><b style="background:var(--lime)"></b>fixe <span id="i_lf" style="margin-left:auto;font-family:'Geist Mono',monospace;font-size:12px;color:var(--txt)">—</span></div>
-      <div><b style="background:var(--blue)"></b>commissions <span id="i_lc" style="margin-left:auto;font-family:'Geist Mono',monospace;font-size:12px;color:var(--txt)">—</span></div></div>`}
     </div>
     <div class="field"><label>Mois concerné</label><input type="month" id="i_m" value="${new Date().toISOString().slice(0,7)}"></div>
-    ${pro?'':`<div class="two"><div class="field"><label>Source</label><input id="i_s" value="salaire"></div>
-    <div class="field"><label>Dont commissions</label><input type="number" id="i_c" step="0.01" inputmode="decimal" placeholder="0,00"></div></div>`}
+    ${pro?'':`<div class="field"><label>Source</label><input id="i_s" value="salaire"></div>`}
     <div class="note" style="padding-bottom:12px">Remplace la saisie existante pour ce mois et cette source.</div>
     <button class="btn ${pro?'indigo':'primary'}" id="i_go">${ic('check',18)} Enregistrer</button>`);
 
-  if(!pro){
-    const v=o.querySelector('#i_v'), c=o.querySelector('#i_c');
-    const maj=()=>{
-      const net=parseFloat(v.value)||0, com=Math.min(Math.abs(parseFloat(c.value)||0),net);
-      const pc=net?Math.round(com/net*100):0;
-      o.querySelector('#i_bar').innerHTML=`<i style="width:${100-pc}%;background:var(--lime)"></i><i style="width:${pc}%;background:var(--blue)"></i>`;
-      o.querySelector('#i_lf').textContent=eur0(net-com);
-      o.querySelector('#i_lc').textContent=eur0(com);
-    };
-    v.oninput=maj; c.oninput=maj; maj();
-  }
-
   o.querySelector('#i_go').onclick=async()=>{
     const v=parseFloat(o.querySelector('#i_v').value); if(isNaN(v)) return toast('Montant manquant');
-    const com=pro?NaN:parseFloat(o.querySelector('#i_c').value);
     const {error}=await SB.from('incomes').upsert({user_id:U.id,mois:o.querySelector('#i_m').value+'-01',montant_net:v,
       source:pro?'frais pro':(o.querySelector('#i_s').value||'salaire'),hors_budget:!!pro,
-      confirme:true,detail:isNaN(com)?null:{commissions:com}},{onConflict:'user_id,mois,source'});
+      confirme:true},{onConflict:'user_id,mois,source'});
     if(error) return toast(error.message);
     o.remove(); toast('Revenu enregistré'); load();
   };
@@ -1495,25 +1464,6 @@ function openImpots(){
   o.querySelector('#im_no').onclick=async()=>{
     await SB.from('settings').upsert({user_id:U.id,impots_traites_an:an},{onConflict:'user_id'});
     o.remove(); toast('Noté'); load();
-  };
-}
-
-async function inventairePonto(){
-  const {data:{session}} = await SB.auth.getSession();
-  if(!session) return toast('Session expirée');
-  toast('Interrogation de Ponto…');
-  const r = await fetch('https://rjnysyddgpcjzmfbpyba.supabase.co/functions/v1/ponto-sync',{
-    method:'POST',headers:{'Content-Type':'application/json','Authorization':`Bearer ${session.access_token}`},
-    body:JSON.stringify({lister:true})});
-  const j = await r.json().catch(()=>({error:'Réponse illisible'}));
-  const txt = JSON.stringify(j,null,2);
-  const o = sheet(`<h3>Comptes Ponto</h3>
-    <div class="infobox">${ic('info',18)}<div>Rien n'a été écrit en base. Copie ce texte et envoie-le dans la conversation.</div></div>
-    <textarea id="inv" readonly style="height:46vh;padding:12px;border-radius:15px;border:1px solid #2A3038;background:var(--field);color:var(--txt);font:500 12px 'Geist Mono',monospace">${esc(txt)}</textarea>
-    <button class="btn primary" id="cp">Copier</button>`);
-  o.querySelector('#cp').onclick=()=>{
-    const t=o.querySelector('#inv'); t.select();
-    navigator.clipboard?.writeText(t.value).then(()=>toast('Copié'),()=>document.execCommand('copy'));
   };
 }
 

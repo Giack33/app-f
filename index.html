@@ -1286,7 +1286,7 @@ async function syncPonto(forcer){
     });
     const j = await r.json().catch(()=>({error:'Réponse illisible'}));
     if(j.error){ if(forcer) toast(j.error.slice(0,110)); return }
-    if(forcer) toast(`${j.comptes} compte(s), ${j.transactions} opération(s)${j.a_valider?` · ${j.a_valider} à confirmer`:''}`);
+    if(forcer) toast(j.transactions?`${j.comptes} compte(s), ${j.transactions} nouvelle(s) opération(s)${j.a_valider?` · ${j.a_valider} à confirmer`:''}`:`${j.comptes} compte(s) à jour · aucune nouvelle opération`);
     await load();
   }catch(e){ if(forcer) toast('Synchro impossible : '+String(e.message||e).slice(0,80)) }
   finally{ syncEnCours=false }

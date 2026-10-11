@@ -4,10 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Trésorerie</title>
-<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>💶</text></svg>">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%230D0F12'/><path d='M6 23a10 10 0 0 1 20 0' fill='none' stroke='%23262B33' stroke-width='3.6' stroke-linecap='round'/><path d='M6 23a10 10 0 0 1 14.5-8.9' fill='none' stroke='%23D4F25C' stroke-width='3.6' stroke-linecap='round'/></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <link rel="stylesheet" href="styles.css">
 </head>
@@ -15,15 +15,24 @@
 
 <div id="login">
   <div class="loginbox">
-    <div style="font-size:44px;margin-bottom:10px">💶</div>
+    <div class="loginvis">
+      <svg viewBox="0 0 260 150" width="100%" style="max-width:260px" aria-hidden="true">
+        <path d="M 26 128 A 104 104 0 0 1 234 128" fill="none" stroke="#262B33" stroke-width="15" stroke-linecap="round"/>
+        <path d="M 26 128 A 104 104 0 0 1 234 128" fill="none" stroke="#D4F25C" stroke-width="15" stroke-linecap="round"
+              stroke-dasharray="327" stroke-dashoffset="88"/>
+        <text x="130" y="112" text-anchor="middle" fill="#D4F25C" font-family="'Geist Mono',monospace" font-size="42" font-weight="600" letter-spacing="-1.5">642 €</text>
+        <text x="130" y="136" text-anchor="middle" fill="#9BA3AD" font-family="Geist,sans-serif" font-size="12" letter-spacing="1" text-transform="uppercase">RESTE À VIVRE</text>
+      </svg>
+    </div>
     <h1>Trésorerie</h1>
     <p>Ton argent, piloté comme une entreprise.<br>Combien tu peux dépenser, en temps réel.</p>
-    <button class="btn primary" onclick="google()">
+    <button class="btn light" onclick="google()">
       <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#4285F4" d="M45 24c0-1.6-.1-2.7-.4-4H24v7.5h12c-.2 2-1.5 5-4.4 7l6.7 5.2C42.2 36 45 30.6 45 24z"/><path fill="#34A853" d="M24 46c5.9 0 10.9-2 14.5-5.3l-6.9-5.4c-1.9 1.3-4.4 2.2-7.6 2.2-5.8 0-10.7-3.8-12.5-9.1l-7.1 5.5C8 41.1 15.4 46 24 46z"/><path fill="#FBBC05" d="M11.5 28.4c-.5-1.4-.7-2.9-.7-4.4s.3-3 .7-4.4l-7.1-5.5C2.9 17 2 20.4 2 24s.9 7 2.4 9.9l7.1-5.5z"/><path fill="#EA4335" d="M24 10.4c3.3 0 5.5 1.4 6.8 2.6l5.9-5.8C33.1 3.9 29.9 2 24 2 15.4 2 8 6.9 4.4 14.1l7.1 5.5c1.8-5.3 6.7-9.2 12.5-9.2z"/></svg>
       Se connecter avec Google
     </button>
     <div class="sep">ou par e-mail</div>
-    <input type="email" id="mail" placeholder="ton@email.fr">
+    <div class="field" style="text-align:left"><label for="mail">Adresse e-mail</label>
+      <input type="email" id="mail" placeholder="ton@email.fr"></div>
     <button class="btn" onclick="magic()">Recevoir un lien de connexion</button>
   </div>
 </div>
@@ -31,12 +40,12 @@
 <div id="app" class="hidden">
   <header><div class="ttl" id="htitle">Pilotage</div></header>
   <div class="wrap" id="view"></div>
-  <button class="fab" onclick="openAdd()">+</button>
   <nav>
-    <button data-t="home" class="on" onclick="go('home')"><span>◎</span>Pilotage</button>
-    <button data-t="flux" onclick="go('flux')"><span>≡</span>Mouvements</button>
-    <button data-t="fixe" onclick="go('fixe')"><span>↻</span>Charges</button>
-    <button data-t="set" onclick="go('set')"><span>⚙</span>Réglages</button>
+    <button data-t="home" class="on" onclick="go('home')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 17a9 9 0 1 1 17 0"/><path d="M12 13.5 16 9"/></svg>Pilotage</button>
+    <button data-t="flux" onclick="go('flux')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 7h11M7 7l3-3M7 7l3 3"/><path d="M17 17H6M17 17l-3-3M17 17l-3 3"/></svg>Mouvements</button>
+    <button class="fab" onclick="openCreer()" aria-label="Créer"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg></button>
+    <button data-t="fixe" onclick="go('fixe')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 2l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><path d="M7 22l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>Charges</button>
+    <button data-t="set" onclick="go('set')"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3"/><path d="M1 14h6M9 8h6M17 16h6"/></svg>Réglages</button>
   </nav>
 </div>
 
@@ -46,6 +55,7 @@ const SB = supabase.createClient(
   'sb_publishable_U4U7mmNvzILkPh7LkNwkkw_2xIkoCz9'
 );
 let U=null, D={}, TAB='home';
+let FLUX={q:'',f:'tout'};   // etat local de l'ecran Mouvements (filtres cote client)
 const TITRES={home:'Pilotage',flux:'Mouvements',fixe:'Charges & revenus',set:'Réglages'};
 const eur = n => (n<0?'-':'')+Math.abs(n).toLocaleString('fr-FR',{minimumFractionDigits:2,maximumFractionDigits:2})+' €';
 const eur0 = n => (n<0?'-':'')+Math.abs(Math.round(n)).toLocaleString('fr-FR')+' €';
@@ -54,6 +64,39 @@ const jsq = s => String(s==null?'':s).replace(/\\/g,'\\\\').replace(/'/g,"\\'");
 const PERIODE={hebdomadaire:'par semaine',mensuel:'par mois',bimestriel:'tous les 2 mois',trimestriel:'par trimestre',semestriel:'par semestre',annuel:'par an'};
 const PAR_AN={hebdomadaire:52,mensuel:12,bimestriel:6,trimestriel:4,semestriel:2,annuel:1};
 const parMois = r => Number(r.montant)*(PAR_AN[r.frequence]||12)/12;
+
+const ICP={
+  home:'<path d="M3.5 17a9 9 0 1 1 17 0"/><path d="M12 13.5 16 9"/>',
+  flux:'<path d="M7 7h11M7 7l3-3M7 7l3 3"/><path d="M17 17H6M17 17l-3-3M17 17l-3 3"/>',
+  repeat:'<path d="M17 2l4 4-4 4"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><path d="M7 22l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/>',
+  set:'<path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3"/><path d="M1 14h6M9 8h6M17 16h6"/>',
+  plus:'<path d="M12 5v14M5 12h14"/>',
+  x:'<path d="M18 6 6 18M6 6l12 12"/>',
+  check:'<path d="M20 6 9 17l-5-5"/>',
+  dash:'<path d="M5 12h14"/>',
+  clock:'<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/>',
+  info:'<circle cx="12" cy="12" r="9"/><path d="M12 11v5"/><circle cx="12" cy="8" r=".7" fill="currentColor" stroke="none"/>',
+  quest:'<circle cx="12" cy="12" r="9"/><path d="M9.6 9.4a2.5 2.5 0 1 1 3.4 2.4c-.6.3-1 .9-1 1.6v.3"/><circle cx="12" cy="17" r=".8" fill="currentColor" stroke="none"/>',
+  sync:'<path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 4v5h-5"/>',
+  edit:'<path d="M12 20h9"/><path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4z"/>',
+  search:'<circle cx="11" cy="11" r="7"/><path d="M20 20l-4.3-4.3"/>',
+  users:'<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.9"/><path d="M16 3.1a4 4 0 0 1 0 7.8"/>',
+  lock:'<rect x="3" y="11" width="18" height="10" rx="2.5"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>',
+  card:'<rect x="2" y="5" width="20" height="14" rx="3"/><path d="M2 10h20"/>',
+  bank:'<path d="M3 10 12 4l9 6"/><path d="M5 10v10h14V10"/><path d="M3 20h18"/>',
+  wallet:'<path d="M12 3v12M12 15l-4-4M12 15l4-4"/><path d="M4 19h16"/>',
+  out:'<path d="M12 21V9M12 9 8 13M12 9l4 4"/><path d="M4 5h16"/>',
+  case:'<rect x="2" y="7" width="20" height="14" rx="2.5"/><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><path d="M2 13h20"/>',
+  receipt:'<path d="M5 3h14v18l-3-2-2 2-2-2-2 2-3-2z"/><path d="M9 8h6M9 12h6"/>',
+  bell:'<path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/>',
+  trash:'<path d="M3 6h18"/><path d="M8 6V4h8v2"/><path d="M6 6l1 14h10l1-14"/>',
+  mail:'<rect x="2" y="4" width="20" height="16" rx="3"/><path d="M3 6l9 7 9-7"/>',
+  doc:'<path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5"/>'
+};
+const ic=(n,s=20)=>`<svg width="${s}" height="${s}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICP[n]||''}</svg>`;
+
+const TINT={'var(--green)':'var(--lime-bg)','var(--orange)':'var(--amber-bg)','var(--red)':'var(--coral-bg)'};
+const hd=(over,ttl,right='')=>`<div class="scrhead"><div style="min-width:0"><div class="over">${over}</div><div class="scr-ttl">${ttl}</div></div><div style="display:flex;gap:8px;align-items:center;flex-shrink:0">${right}</div></div>`;
 
 function toast(m){const t=document.createElement('div');t.className='toast';t.textContent=m;document.body.appendChild(t);setTimeout(()=>t.remove(),2600)}
 
@@ -504,88 +547,112 @@ function render(){
   document.getElementById('view').innerHTML={home:vHome,flux:vFlux,fixe:vFixe,set:vSet}[TAB]();
   document.querySelector('.fab').classList.toggle('hidden',TAB==='set');
   if(TAB==='home') drawChart();
+  if(TAB==='flux') renderFlux();
 }
 function go(t){TAB=t;render();window.scrollTo(0,0)}
 
 function vHome(){
   const m=moteur(), ap=aPrevoir();
   const dernier=m.finMois.getDate();
-  let h=`<div class="hero" style="--heroc:${m.couleur}">
+  const ratio=Math.max(0,Math.min(1,m.reste/((m.reste+m.depMois)||1)));
+  const inits=((U&&U.email)||'').replace(/[^a-zA-Z]/g,'').slice(0,2).toUpperCase()||'MOI';
+  const sync=D.pontoCred?`<button class="iconbtn" onclick="syncPonto(true)" aria-label="Synchroniser les comptes">${ic('sync',20)}</button>`:'';
+  let h=hd(new Date().toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'}),'Pilotage',sync+`<div class="avat">${inits}</div>`);
+
+  h+=`<div class="hero" style="--heroc:${m.couleur};--herobg:${TINT[m.couleur]||'var(--panel2)'}">
     <div class="lbl">Reste à vivre</div>
-    <div class="big num">${eur(m.reste)}</div>
+    <svg class="gauge" viewBox="0 0 300 168" role="img" aria-label="Reste à vivre ${eur0(m.reste)}">
+      <path class="trk" d="M 30 150 A 120 120 0 0 1 270 150"/>
+      <path class="prg" d="M 30 150 A 120 120 0 0 1 270 150" style="stroke-dashoffset:${(377*(1-ratio)).toFixed(1)}"/>
+      <text x="150" y="134" text-anchor="middle" fill="${m.couleur}" font-family="'Geist Mono',monospace" font-size="46" font-weight="600" letter-spacing="-1.5">${eur0(m.reste)}</text>
+    </svg>
     <div class="sub">pour ${m.joursAvantEntree} jour${m.joursAvantEntree>1?'s':''} — ${m.prochaine?`jusqu'à ${esc(m.prochaine.nom)} le ${m.prochaine.date.toLocaleDateString('fr-FR',{day:'numeric',month:'short'})}`:"jusqu'à la fin du mois"} · charges déjà déduites</div>
     <div class="verdict"><i class="dot"></i>${m.verdict}</div>
+    <div class="minitiles">
+      <div class="minitile"><div class="k">Budget semaine</div><div class="v" style="color:${m.couleur}">${eur0(m.hebdo)}</div><div class="n">${eur0(m.parJour)} par jour</div></div>
+      <div class="minitile"><div class="k">Charges fixes</div><div class="v">${eur0(m.chargesMois)}</div><div class="n">moyenne lissée / mois</div></div>
+    </div>
   </div>
+
   <div class="grid">
-    <div class="card"><div class="k">Budget semaine</div><div class="v num" style="color:${m.couleur}">${eur0(m.hebdo)}</div><div class="n">${eur0(m.parJour)} par jour</div></div>
-    <div class="card"><div class="k">Solde commun</div><div class="v num">${eur0(m.soldeCommun)}</div><div class="n">${m.comptesCommuns.length?m.comptesCommuns.map(a=>esc(a.nom)).join(' · '):'aucun compte partagé'}</div></div>
-    <div class="card"><div class="k">Solde perso</div><div class="v num">${eur0(m.soldePerso)}</div><div class="n">${m.comptesPersos.length?m.comptesPersos.map(a=>esc(a.nom)).join(' · '):'aucun compte perso'}</div></div>
-    <div class="card clic" onclick="openASortir()"><div class="k">À sortir d'ici la fin du mois</div><div class="v num neg">${eur0(m.totalAVenirMois)}</div><div class="n">${m.aVenirMois.length} échéance${m.aVenirMois.length>1?'s':''} ›</div></div>
-    <div class="card clic" onclick="openPrevoir()"><div class="k">À prévoir pour ${ap.nomMois}</div><div class="v num neg">${eur0(ap.total)}</div><div class="n">charges, épargne et dépenses contraintes ›</div></div>
-    <div class="card"><div class="k">Charges fixes</div><div class="v num">${eur0(m.chargesMois)}</div><div class="n">moyenne lissée / mois</div></div>
+    <div class="card"><div class="ic" style="background:var(--blue-bg);color:var(--blue)">${ic('users',20)}</div>
+      <div class="k">Solde commun</div><div class="v">${eur0(m.soldeCommun)}</div>
+      <div class="n">${m.comptesCommuns.length?m.comptesCommuns.map(a=>esc(a.nom)).join(' · '):'aucun compte partagé'}</div></div>
+    <div class="card"><div class="ic" style="background:#241C33;color:var(--violet)">${ic('lock',20)}</div>
+      <div class="k">Solde perso</div><div class="v">${eur0(m.soldePerso)}</div>
+      <div class="n">${m.comptesPersos.length?m.comptesPersos.map(a=>esc(a.nom)).join(' · '):'aucun compte perso'}</div></div>
+    <div class="card clic" onclick="openASortir()"><div class="ic" style="background:var(--coral-bg);color:var(--coral)">${ic('out',20)}</div>
+      <div class="k">À sortir d'ici le ${dernier}</div><div class="v neg">${eur0(m.totalAVenirMois)}</div>
+      <div class="n">${m.aVenirMois.length} échéance${m.aVenirMois.length>1?'s':''} ›</div></div>
+    <div class="card clic" onclick="openPrevoir()"><div class="ic" style="background:var(--amber-bg);color:var(--amber)">${ic('receipt',20)}</div>
+      <div class="k">À prévoir pour ${ap.nomMois}</div><div class="v neg">${eur0(ap.total)}</div>
+      <div class="n">charges, épargne et dépenses contraintes ›</div></div>
   </div>`;
 
   if(m.proRecu){
-    h+=`<div class="empty" style="border-color:#22c55e66;color:var(--green);margin:12px 0">✅ Remboursement Generali reçu : ${eur(Number(m.proRecu.montant_recu||m.proRecu.montant))}. Combien tu vires sur N26 ?
-      <div style="margin-top:12px"><button class="btn" onclick="openVirN26('${m.proRecu.id}')">Saisir le virement N26</button></div></div>`;
+    h+=`<div class="banner ok" style="margin-top:12px"><div class="bic">${ic('check',20)}</div><div style="min-width:0">
+      <div class="bt">Remboursement Generali reçu</div>
+      <div class="bs">${eur(Number(m.proRecu.montant_recu||m.proRecu.montant))} encaissés. Combien tu vires sur N26 ?</div>
+      <div class="ba"><button onclick="openVirN26('${m.proRecu.id}')">Saisir le virement</button></div></div></div>`;
   }
 
   if(m.aValider.length){
-    h+=`<h2>À confirmer <span class="count">${m.aValider.length}</span></h2>`;
+    h+=`<h2>À confirmer <span class="count">${m.aValider.length}</span></h2><div class="list">`;
     m.aValider.slice(0,6).forEach(t=>{
       h+=`<div class="valid"><div class="top">
           <div style="min-width:0"><div class="t">${esc(t.libelle)}</div>
           <div class="s">${new Date(t.date_operation+'T00:00:00').toLocaleDateString('fr-FR',{day:'numeric',month:'long'})}</div></div>
-          <div class="amt ${Number(t.montant)<0?'neg':'pos'}" style="font-size:18px">${eur(Number(t.montant))}</div></div>
+          <div class="amt ${Number(t.montant)<0?'neg':'pos'}" style="font-size:19px">${eur(Number(t.montant))}</div></div>
         <div class="chips">${D.cats.filter(c=>c.type!=='revenu').map(c=>
-          `<button class="chip" onclick="classe('${t.id}','${c.id}','${jsq(t.libelle)}')">${esc(c.nom)}</button>`).join('')}</div></div>`;
+          `<button class="chip" onclick="classe('${t.id}','${c.id}','${jsq(t.libelle)}')"><b style="background:${c.couleur||'#9BA3AD'}"></b>${esc(c.nom)}</button>`).join('')}</div></div>`;
     });
+    h+=`</div>`;
   }
 
-  h+=`<h2>D'ici le ${dernier} <span class="count">${m.negPrevu?'⚠ passage en négatif':'jamais en négatif'}</span></h2><div class="chartbox"><div id="chart"></div></div>`;
+  h+=`<h2>D'ici le ${dernier} <span class="count" style="color:${m.negPrevu?'var(--coral)':'var(--lime)'};background:${m.negPrevu?'var(--coral-bg)':'var(--lime-bg)'}">${m.negPrevu?'passage en négatif':'jamais en négatif'}</span></h2>
+    <div class="chartbox"><div id="chart"></div></div>`;
   if(!m.quotidien) h+=`<div class="note">Les dépenses du quotidien ne sont pas encore estimées : la courbe ne tient compte que des charges connues.</div>`;
 
   h+=`<h2>Ce qui tombe bientôt <span class="count">${eur0(m.totalAVenirMois)}</span></h2>`;
-  h+=m.aVenirMois.length?m.aVenirMois.map(p=>`<div class="row">
-      <div class="ic">${p.facture?'📄':p.abo?'🔁':'🏠'}</div>
+  if(m.aVenirMois.length){
+    h+=`<div class="list">`+m.aVenirMois.slice(0,3).map(p=>`<div class="row">
+      <div class="datepill"><i>${p.date.getDate()}</i><u>${p.date.toLocaleDateString('fr-FR',{month:'short'}).replace('.','')}</u></div>
       <div class="mid"><div class="t">${esc(p.nom)}</div>
-      <div class="s">${p.date.toLocaleDateString('fr-FR',{weekday:'short',day:'numeric',month:'short'})}${p.facture?' · facture':''}</div></div>
-      <div class="amt neg">${eur(-p.montant)}</div></div>`).join('')
-    : `<div class="empty">Plus rien à sortir d'ici la fin du mois.</div>`;
+      <div class="s">${p.date.toLocaleDateString('fr-FR',{weekday:'long'})}${p.facture?' · facture':p.abo?' · abonnement':''}</div></div>
+      <div class="amt neg">${eur(-p.montant)}</div></div>`).join('');
+    if(m.aVenirMois.length>3) h+=`<div class="row clic" onclick="openASortir()" style="color:var(--lime)">
+      <div class="mid"><div class="t" style="color:var(--lime)">Voir les ${m.aVenirMois.length} échéances</div></div><div>›</div></div>`;
+    h+=`</div>`;
+  } else h+=`<div class="empty">Plus rien à sortir d'ici la fin du mois.</div>`;
 
   const cats=Object.entries(m.parCat).sort((a,b)=>b[1]-a[1]);
+  const maxc=cats.length?cats[0][1]:1;
   h+=`<h2 class="clic" onclick="openDepMois()">Dépenses du mois <span class="count">${eur0(m.depMois)}</span></h2>`;
-  h+=cats.length?cats.map(([n,v])=>{
+  h+=cats.length?`<div class="list">`+cats.map(([n,v])=>{
       const prec=m.parCatPrec[n]||0, diff=prec?Math.round((v-prec)/prec*100):null;
-      const col=D.cats.find(c=>c.nom===n)?.couleur||'#64748b';
-      return `<div class="row clic" onclick="openDepMois('${jsq(n)}')">
-        <div class="ic" style="background:${col}22;color:${col}">${Math.round(v/m.depMois*100)}%</div>
-        <div class="mid"><div class="t">${esc(n)}</div>
-        <div class="s">${diff===null?'pas de comparaison':(diff>0?`▲ ${diff}% vs mois dernier`:`▼ ${Math.abs(diff)}% vs mois dernier`)}</div></div>
-        <div class="amt">${eur0(v)}</div></div>`;
-    }).join('') : `<div class="empty">Aucune dépense enregistrée ce mois-ci.</div>`;
-
-  if(m.abos.length){
-    const tot=m.abos.reduce((s,a)=>s+parMois(a),0);
-    h+=`<h2>Abonnements <span class="count">${eur0(tot)} / mois</span></h2>`;
-    h+=m.abos.map(a=>`<div class="row"><div class="ic">🔁</div>
-      <div class="mid"><div class="t">${esc(a.nom)}</div>
-      <div class="s">${a.fin_essai_gratuit?`⚠ essai gratuit jusqu'au ${new Date(a.fin_essai_gratuit+'T00:00:00').toLocaleDateString('fr-FR')}`:`le ${a.jour_prelevement||'?'} ${PERIODE[a.frequence]||''}`}</div></div>
-      <div class="amt neg">${eur(-a.montant)}</div></div>`).join('');
-    h+=`<div class="note">Soit ${eur0(tot*12)} sur l'année.</div>`;
-  }
+      const col=D.cats.find(c=>c.nom===n)?.couleur||'#9BA3AD';
+      return `<div class="row clic" onclick="openDepMois('${jsq(n)}')" style="display:block">
+        <div style="display:flex;justify-content:space-between;gap:10px;align-items:baseline">
+          <div class="t">${esc(n)}</div><div class="amt">${eur0(v)}</div></div>
+        <div class="bar"><i style="width:${Math.max(3,Math.round(v/maxc*100))}%;background:${col}"></i></div>
+        <div class="s" style="margin-top:7px">${diff===null?'pas de comparaison':(diff>0?`▲ ${diff} % vs mois dernier`:`▼ ${Math.abs(diff)} % vs mois dernier`)}</div></div>`;
+    }).join('')+`</div>` : `<div class="empty">Aucune dépense enregistrée ce mois-ci.</div>`;
 
   const det=abosDetectes();
-  if(det.length){
-    const totd=det.reduce((s,a)=>s+a.montant,0);
-    h+=`<h2>Détectés, pas encore déclarés <span class="count">${eur0(totd)} / mois</span></h2>`;
-    h+=det.map(a=>`<div class="row"><div class="ic" style="background:#f59e0b22;color:#f59e0b">?</div>
+  if(m.abos.length||det.length){
+    const totAbo=m.abos.reduce((s,a)=>s+parMois(a),0), totDet=det.reduce((s,a)=>s+a.montant,0);
+    h+=`<h2>Abonnements <span class="count">${eur0(totAbo+totDet)} / mois</span></h2><div class="list">`;
+    h+=m.abos.map(a=>`<div class="row"><div class="ic" style="background:var(--blue-bg);color:var(--blue)">${ic('repeat',18)}</div>
       <div class="mid"><div class="t">${esc(a.nom)}</div>
-      <div class="s">environ le ${a.jour} · ${a.mois} mois d'affilée</div></div>
+      <div class="s"${a.fin_essai_gratuit?' style="color:var(--amber)"':''}>${a.fin_essai_gratuit?`essai gratuit jusqu'au ${new Date(a.fin_essai_gratuit+'T00:00:00').toLocaleDateString('fr-FR')}`:`le ${a.jour_prelevement||'?'} ${PERIODE[a.frequence]||''}`}</div></div>
+      <div class="amt neg">${eur(-a.montant)}</div></div>`).join('');
+    h+=det.map(a=>`<div class="row"><div class="ic" style="background:var(--amber-bg);color:var(--amber)">${ic('quest',18)}</div>
+      <div class="mid"><div class="t">${esc(a.nom)}</div>
+      <div class="s">environ le ${a.jour} · ${a.mois} mois d'affilée · à confirmer</div></div>
       <div class="amt neg">${eur(-a.montant)}</div>
-      <button class="mini" onclick='adopterAbo(${JSON.stringify(JSON.stringify(a))})'>+</button>
-      <button class="mini" onclick='ignorerAbo(${JSON.stringify(a.cle)})'>✕</button></div>`).join('');
-    h+=`<div class="note">« + » pour en faire une charge suivie, « ✕ » pour ne plus la voir.</div>`;
+      <button class="mini ok" onclick='adopterAbo(${JSON.stringify(JSON.stringify(a))})' aria-label="Suivre cette charge">${ic('plus',15)}</button>
+      <button class="mini" onclick='ignorerAbo(${JSON.stringify(a.cle)})' aria-label="Ignorer">${ic('x',15)}</button></div>`).join('');
+    h+=`</div><div class="note">Soit ${eur0((totAbo+totDet)*12)} sur l'année.${det.length?` Les lignes ambre sont détectées automatiquement : « + » pour les suivre, « ✕ » pour les masquer.`:''}</div>`;
   }
   return h;
 }
@@ -602,139 +669,236 @@ function drawChart(){
   const X=i=>L+i*step;
   const Y=v=>T+(mx-v)/(mx-mn)*(H-T-B);
   const f1=v=>v.toFixed(1);
-  const col=m.couleur;
+  const col=m.couleur, AMB='#F2B84B', COR='#FF8A6B', LIM='#D4F25C', FNT='#6F7882';
 
-  // bandes du week-end
-  let we='';
-  p.forEach((x,i)=>{
-    const j=x.d.getDay();
-    if(j===0||j===6){
-      const x0=Math.max(L,X(i)-step/2), x1=Math.min(W-R,X(i)+step/2);
-      we+=`<rect x="${f1(x0)}" y="${T}" width="${f1(Math.max(0,x1-x0))}" height="${H-T-B}" fill="#ffffff" opacity=".022"/>`;
-    }
-  });
-
-  // grille + échelle
+  // deux repères horizontaux discrets + échelle
   let gy='';
-  const niveaux=[mx,mx-(mx-mn)/3,mn+(mx-mn)/3,mn];
-  niveaux.forEach(v=>{
-    gy+=`<line x1="${L}" y1="${f1(Y(v))}" x2="${W-R}" y2="${f1(Y(v))}" stroke="#263241" stroke-width="1"/>
-         <text x="${L-8}" y="${f1(Y(v)+3.5)}" fill="#5f7183" font-size="10.5" font-family="Inter,sans-serif" text-anchor="end">${eur0(v)}</text>`;
+  [mx,mn].forEach(v=>{
+    gy+=`<line x1="${L}" y1="${f1(Y(v))}" x2="${W-R}" y2="${f1(Y(v))}" stroke="#242A32" stroke-width="1"/>
+         <text x="${L-8}" y="${f1(Y(v)+3.5)}" fill="${FNT}" font-size="10" font-family="'Geist Mono',monospace" text-anchor="end">${eur0(v)}</text>`;
   });
 
-  const line=p.map((x,i)=>`${i?'L':'M'}${f1(X(i))} ${f1(Y(x.bal))}`).join(' ');
+  // courbe en escalier
+  let line=`M${f1(X(0))} ${f1(Y(p[0].bal))}`;
+  for(let i=1;i<n;i++) line+=` H${f1(X(i))} V${f1(Y(p[i].bal))}`;
   const base=Y(mn);
   const area=`${line} L${f1(X(n-1))} ${f1(base)} L${f1(X(0))} ${f1(base)} Z`;
   const z=Y(0);
   const neg=p.find(x=>x.bal<0);
 
-  // repères : jours où une charge tombe
+  // seuil de prudence
+  const so=Number(D.set.seuil_orange??200);
+  const ys=Y(so);
+  const seuil=(so>mn&&so<mx)?`<line x1="${L}" y1="${f1(ys)}" x2="${W-R}" y2="${f1(ys)}" stroke="${AMB}" stroke-width="1.2" stroke-dasharray="6 5" opacity=".75"/>
+    <text x="${W-R-4}" y="${f1(ys-7)}" fill="${AMB}" font-size="10" font-family="'Geist Mono',monospace" text-anchor="end">seuil ${eur0(so)}</text>`:'';
+
+  // marqueurs : entrées nommées + grosses charges
   let marks='';
   const gros=[...p].filter(x=>x.out>0).sort((a,b)=>b.out-a.out).slice(0,3).map(x=>x.d.toDateString());
   p.forEach((x,i)=>{
-    if(!x.out && !x.inn) return;
-    const c=x.inn>x.out?'#22c55e':'#ef4444';
-    marks+=`<line x1="${f1(X(i))}" y1="${f1(Y(x.bal))}" x2="${f1(X(i))}" y2="${H-B}" stroke="${c}" stroke-width="1" opacity=".28"/>
-            <circle cx="${f1(X(i))}" cy="${f1(Y(x.bal))}" r="3.2" fill="#141b24" stroke="${c}" stroke-width="1.8"/>`;
-    if(x.out>0 && gros.includes(x.d.toDateString())){
-      const anc=i>n-5?'end':(i<4?'start':'middle');
-      marks+=`<text x="${f1(X(i))}" y="${f1(Math.max(T+10,Y(x.bal)-10))}" fill="#8da0b5" font-size="10" font-family="Inter,sans-serif" text-anchor="${anc}">−${eur0(x.out)}</text>`;
+    const yb=f1(Y(x.bal));
+    if(x.inn>0){
+      const nom=(x.nomsIn&&x.nomsIn[0])||'entrée';
+      const anc=i>n-6?'end':(i<5?'start':'middle');
+      marks+=`<line x1="${f1(X(i))}" y1="${yb}" x2="${f1(X(i))}" y2="${H-B}" stroke="${LIM}" stroke-width="1" opacity=".3"/>
+        <circle cx="${f1(X(i))}" cy="${yb}" r="3.4" fill="var(--panel)" stroke="${LIM}" stroke-width="2"/>
+        <text x="${f1(X(i))}" y="${f1(Math.max(T+10,Y(x.bal)-11))}" fill="${LIM}" font-size="10" font-weight="600" font-family="Geist,sans-serif" text-anchor="${anc}">${esc(String(nom).slice(0,14))}</text>`;
+    } else if(x.out>0){
+      marks+=`<circle cx="${f1(X(i))}" cy="${yb}" r="2.6" fill="${COR}"/>`;
+      if(gros.includes(x.d.toDateString())){
+        const anc=i>n-5?'end':(i<4?'start':'middle');
+        marks+=`<text x="${f1(X(i))}" y="${f1(Math.min(H-B-6,Y(x.bal)+15))}" fill="${FNT}" font-size="10" font-family="'Geist Mono',monospace" text-anchor="${anc}">−${eur0(x.out)}</text>`;
+      }
     }
   });
 
-  // dates en bas : aujourd'hui, tous les 7 jours, fin de mois
+  // axe des dates
   let lbl='';
   const idx=new Set([0,n-1]);
   const pas=n>35?14:7;
   for(let i=pas;i<n-3;i+=pas) idx.add(i);
   [...idx].sort((a,b)=>a-b).forEach(i=>{
     const anc=i===0?'start':(i===n-1?'end':'middle');
-    const txt=i===0?"auj.":p[i].d.toLocaleDateString('fr-FR',{day:'numeric',month:'short'});
-    lbl+=`<text x="${f1(X(i))}" y="${H-12}" fill="#5f7183" font-size="11" font-family="Inter,sans-serif" text-anchor="${anc}">${txt}</text>`;
+    const txt=i===0?"auj.":p[i].d.toLocaleDateString('fr-FR',{day:'numeric',month:'short'}).replace('.','');
+    lbl+=`<text x="${f1(X(i))}" y="${H-12}" fill="${FNT}" font-size="10" font-family="'Geist Mono',monospace" text-anchor="${anc}">${txt}</text>`;
   });
 
-  // étiquette de fin de mois
+  // étiquette de fin de période
   const yEnd=Math.min(H-B-12,Math.max(T+12,Y(p[n-1].bal)));
   const fin=eur0(p[n-1].bal);
   const wBox=Math.max(52,fin.length*7.6);
-  const endCol=p[n-1].bal<0?'#ef4444':col;
+  const endCol=p[n-1].bal<0?COR:col;
 
-  document.getElementById('chart').innerHTML=`<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" role="img">
-    <defs><linearGradient id="gr" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0%" stop-color="${col}" stop-opacity=".30"/><stop offset="100%" stop-color="${col}" stop-opacity="0"/></linearGradient></defs>
-    ${we}
+  document.getElementById('chart').innerHTML=`<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Projection du solde">
     ${gy}
-    ${z>T&&z<H-B?`<line x1="${L}" y1="${f1(z)}" x2="${W-R}" y2="${f1(z)}" stroke="#ef4444" stroke-width="1.2" stroke-dasharray="5 4" opacity=".7"/>`:''}
-    <path d="${area}" fill="url(#gr)"/>
-    <path d="${line}" fill="none" stroke="${col}" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>
+    ${z>T&&z<H-B?`<line x1="${L}" y1="${f1(z)}" x2="${W-R}" y2="${f1(z)}" stroke="${COR}" stroke-width="1.2" stroke-dasharray="5 4" opacity=".7"/>`:''}
+    ${seuil}
+    <path d="${area}" fill="${col}" fill-opacity=".12"/>
+    <path d="${line}" fill="none" stroke="${col}" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>
     ${marks}
-    <circle cx="${f1(X(0))}" cy="${f1(Y(p[0].bal))}" r="5" fill="${col}"/>
-    <circle cx="${f1(X(0))}" cy="${f1(Y(p[0].bal))}" r="9" fill="${col}" opacity=".22"/>
+    <circle cx="${f1(X(0))}" cy="${f1(Y(p[0].bal))}" r="5.5" fill="var(--panel)" stroke="${col}" stroke-width="2.5"/>
+    <text x="${f1(X(0))}" y="${f1(Math.max(T+9,Y(p[0].bal)-13))}" fill="${FNT}" font-size="9.5" font-family="Geist,sans-serif" text-anchor="start" letter-spacing=".8">AUJOURD'HUI</text>
     <circle cx="${f1(X(n-1))}" cy="${f1(Y(p[n-1].bal))}" r="4" fill="${endCol}"/>
-    <rect x="${W-R+4}" y="${f1(yEnd-11)}" width="${f1(Math.min(wBox,R-8))}" height="22" rx="6" fill="${endCol}" opacity=".16"/>
-    <text x="${W-R+10}" y="${f1(yEnd+4)}" fill="${endCol}" font-size="12" font-weight="700" font-family="'JetBrains Mono',monospace">${fin}</text>
+    <rect x="${W-R+4}" y="${f1(yEnd-11)}" width="${f1(Math.min(wBox,R-8))}" height="22" rx="7" fill="${endCol}" opacity=".16"/>
+    <text x="${W-R+10}" y="${f1(yEnd+4)}" fill="${endCol}" font-size="12" font-weight="600" font-family="'Geist Mono',monospace">${fin}</text>
     ${lbl}</svg>
-    <div class="chiplist"><i><b style="background:${col}"></b>solde projeté</i><i><b style="background:#ef4444"></b>charge</i>${m.inflows.length?`<i><b style="background:#22c55e"></b>entrée attendue</i>`:''}<i>−${eur0(m.quotidien)}/jour de train de vie</i></div>
-    ${neg?`<div style="color:var(--red);font-size:12.5px;font-weight:600;padding:2px 6px 4px">⚠ Solde négatif prévu le ${neg.d.toLocaleDateString('fr-FR',{day:'numeric',month:'long'})}</div>`:''}`;
+    <div class="chiplist"><i><b style="background:${col}"></b>solde projeté</i><i><b style="background:${COR}"></b>charge</i>${m.inflows.length?`<i><b style="background:${LIM}"></b>entrée attendue</i>`:''}<i>−${eur0(m.quotidien)}/jour de train de vie</i></div>
+    ${neg?`<div style="color:var(--coral);font-size:12.5px;font-weight:600;padding:2px 6px 4px">Solde négatif prévu le ${neg.d.toLocaleDateString('fr-FR',{day:'numeric',month:'long'})}</div>`:''}`;
 }
 
 function vFlux(){
-  let h=`<h2>Mouvements <span class="count">${D.tx.length}</span></h2>`;
-  if(!D.tx.length) return h+`<div class="empty">Rien pour l'instant.<br>Appuie sur + pour saisir une dépense.</div>`;
-  let jour='';
-  D.tx.slice(0,150).forEach(t=>{
-    const j=new Date(t.date_operation+'T00:00:00').toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'});
-    if(j!==jour){h+=`<div style="color:var(--dim);font-size:11.5px;font-weight:600;margin:16px 0 7px;text-transform:uppercase;letter-spacing:.5px">${j}</div>`;jour=j}
-    const c=D.catById[t.category_id];
-    h+=`<div class="row"><div class="ic" style="background:${c?c.couleur+'22':'#1b2430'};color:${c?c.couleur:'var(--dim)'}">${t.statut==='a_valider'?'?':'●'}</div>
-      <div class="mid"><div class="t">${esc(t.libelle)}</div><div class="s">${c?esc(c.nom):'à classer'}</div></div>
-      <div class="amt ${Number(t.montant)<0?'neg':'pos'}">${eur(Number(t.montant))}</div></div>`;
-  });
+  const now=new Date(), AN=now.getFullYear(), MO=now.getMonth();
+  const mois=D.tx.filter(t=>{const d=new Date(t.date_operation+'T00:00:00');
+    return d.getFullYear()===AN&&d.getMonth()===MO&&!t.interne});
+  const inn=mois.reduce((s,t)=>s+Math.max(0,Number(t.montant)),0);
+  const out=mois.reduce((s,t)=>s+Math.max(0,-Number(t.montant)),0);
+  const mxt=Math.max(inn,out)||1;
+  const SEG=[['tout','Tout'],['dep','Dépenses'],['rev','Revenus'],['acl','À classer']];
+
+  let h=hd(now.toLocaleDateString('fr-FR',{month:'long',year:'numeric'}),'Mouvements',
+    `<span class="pill">${D.tx.length}</span>`);
+
+  h+=`<div class="grid" style="margin-top:0">
+    <div class="card"><div class="k">Entrées du mois</div><div class="v pos">${eur0(inn)}</div>
+      <div class="bar"><i style="width:${Math.round(inn/mxt*100)}%;background:var(--lime)"></i></div></div>
+    <div class="card"><div class="k">Sorties du mois</div><div class="v neg">${eur0(out)}</div>
+      <div class="bar"><i style="width:${Math.round(out/mxt*100)}%;background:var(--coral)"></i></div></div>
+  </div>
+
+  <div style="position:relative;margin-top:14px">
+    <div style="position:absolute;left:14px;top:14px;color:var(--faint);pointer-events:none">${ic('search',20)}</div>
+    <input id="fq" type="search" placeholder="Rechercher un libellé…" value="${esc(FLUX.q)}"
+      style="padding-left:44px;margin-bottom:10px" oninput="FLUX.q=this.value;renderFlux()">
+  </div>
+  <div class="seg" id="fseg">${SEG.map(([k,l])=>
+    `<button data-f="${k}" class="${FLUX.f===k?'on':''}" onclick="FLUX.f='${k}';renderFlux()">${l}</button>`).join('')}</div>
+  <div id="fluxlist"></div>`;
   return h;
+}
+
+// Rendu de la liste filtrée (cote client, aucune requete)
+function renderFlux(){
+  const box=document.getElementById('fluxlist'); if(!box) return;
+  document.querySelectorAll('#fseg button').forEach(b=>b.classList.toggle('on',b.dataset.f===FLUX.f));
+  const q=(FLUX.q||'').trim().toLowerCase();
+  const l=D.tx.filter(t=>{
+    const v=Number(t.montant);
+    if(FLUX.f==='dep'&&v>=0) return false;
+    if(FLUX.f==='rev'&&v<=0) return false;
+    if(FLUX.f==='acl'&&!(t.statut==='a_valider'||!D.catById[t.category_id])) return false;
+    if(q&&!String(t.libelle||'').toLowerCase().includes(q)) return false;
+    return true;
+  }).slice(0,150);
+
+  if(!l.length){ box.innerHTML=`<div class="empty">${D.tx.length?'Aucun mouvement ne correspond.':"Rien pour l'instant.<br>Appuie sur + pour saisir une dépense."}</div>`; return }
+
+  const grp=[];
+  l.forEach(t=>{
+    const j=new Date(t.date_operation+'T00:00:00').toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'});
+    if(!grp.length||grp[grp.length-1].j!==j) grp.push({j,ops:[]});
+    grp[grp.length-1].ops.push(t);
+  });
+
+  box.innerHTML=grp.map(g=>{
+    const tot=g.ops.reduce((s,t)=>s+Number(t.montant),0);
+    return `<div class="dayhead"><div class="over">${g.j}</div>
+      <div class="over" style="color:var(--faint)">${g.ops.length} op${g.ops.length>1?'s':''} · ${eur0(tot)}</div></div>
+    <div class="list">`+g.ops.map(t=>{
+      const c=D.catById[t.category_id], acl=t.statut==='a_valider'||!c;
+      const col=acl?'var(--amber)':(c?c.couleur:'var(--muted)');
+      const bg=acl?'var(--amber-bg)':(c&&c.couleur?c.couleur+'22':'var(--panel2)');
+      return `<div class="row"><div class="ic" style="background:${bg};color:${col}">${acl?ic('quest',18):esc((c.nom||'?').trim().charAt(0).toUpperCase())}</div>
+        <div class="mid"><div class="t">${esc(t.libelle)}</div>
+        <div class="s"${acl?' style="color:var(--amber)"':''}>${acl?'à classer':esc(c.nom)}</div></div>
+        <div class="amt ${Number(t.montant)<0?'neg':'pos'}">${eur(Number(t.montant))}</div></div>`;
+    }).join('')+`</div>`;
+  }).join('');
 }
 
 function vFixe(){
   const tot=D.rec.reduce((s,r)=>s+parMois(r),0);
-  let h=`<h2>Charges fixes <span class="count">${eur0(tot)} / mois</span></h2>
-  <button class="btn" style="margin-bottom:12px" onclick="openRec()">+ Ajouter une charge</button>`;
-  h+=D.rec.length?D.rec.map(r=>{
+  const moisKey=d=>d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-01';
+  let h=hd('Récurrent','Charges & revenus');
+
+  // --- recap : total + barre empilee par categorie ---
+  const parCatRec={};
+  D.rec.forEach(r=>{ const c=D.catById[r.category_id];
+    const n=c?c.nom:'Autre', col=(c&&c.couleur)||'#9BA3AD';
+    if(!parCatRec[n]) parCatRec[n]={v:0,col};
+    parCatRec[n].v+=parMois(r); });
+  const segs=Object.entries(parCatRec).sort((a,b)=>b[1].v-a[1].v);
+  h+=`<div class="card" style="border-radius:var(--r-xl);padding:20px 18px">
+    <div class="k">Charges fixes lissées</div>
+    <div style="font-family:'Geist Mono',monospace;font-variant-numeric:tabular-nums;font-size:40px;font-weight:600;letter-spacing:-.04em;margin-top:6px">${eur0(tot)}</div>
+    <div class="n">par mois, toutes fréquences ramenées au mois</div>`;
+  if(segs.length){
+    h+=`<div class="stack">${segs.map(([n,o])=>`<i style="width:${(o.v/(tot||1)*100).toFixed(1)}%;background:${o.col}" title="${esc(n)}"></i>`).join('')}</div>
+      <div class="legend">${segs.map(([n,o])=>`<div><b style="background:${o.col}"></b><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(n)}</span><span style="margin-left:auto;color:var(--txt);font-family:'Geist Mono',monospace;font-size:12px">${eur0(o.v)}</span></div>`).join('')}</div>`;
+  }
+  h+=`</div>
+  <button class="btn dash" style="margin-top:10px" onclick="openRec()">${ic('plus',18)} Ajouter une charge</button>`;
+
+  h+=`<h2>Charges <span class="count">${D.rec.length}</span></h2>`;
+  h+=D.rec.length?`<div class="list">`+D.rec.map(r=>{
     const lisse=r.frequence!=='mensuel'?` · ${eur0(parMois(r))}/mois lissé`:'';
     const quand=r.frequence==='mensuel'?`le ${r.jour_prelevement||'?'} du mois`
       :(r.prochaine_echeance?`prochaine : ${new Date(r.prochaine_echeance+'T00:00:00').toLocaleDateString('fr-FR',{day:'numeric',month:'short',year:'2-digit'})}`:PERIODE[r.frequence]);
-    return `<div class="row"><div class="ic">${r.est_abonnement?'🔁':'🏠'}</div>
+    const c=D.catById[r.category_id], col=(c&&c.couleur)||'#9BA3AD';
+    return `<div class="row"><div class="ic" style="background:${col}22;color:${col}">${r.est_abonnement?ic('repeat',18):esc((c?c.nom:'·').trim().charAt(0).toUpperCase())}</div>
       <div class="mid"><div class="t">${esc(r.nom)}</div><div class="s">${quand}${lisse}</div></div>
       <div class="amt neg">${eur(-r.montant)}</div>
-      <button class="chip" style="padding:5px 9px" onclick="delRec('${r.id}','${jsq(r.nom)}')">✕</button></div>`;
-  }).join('') : `<div class="empty">Ajoute loyer, crédits, assurances, abonnements.</div>`;
+      <button class="mini" onclick="delRec('${r.id}','${jsq(r.nom)}')" aria-label="Supprimer ${esc(r.nom)}">${ic('x',15)}</button></div>`;
+  }).join('')+`</div>` : `<div class="empty">Ajoute loyer, crédits, assurances, abonnements.</div>`;
 
+  // --- revenus ---
   const parM={};
   D.inc.forEach(i=>{ (parM[i.mois]=parM[i.mois]||[]).push(i) });
+  const net=k=>(parM[k]||[]).filter(i=>!i.hors_budget).reduce((s,i)=>s+Number(i.montant_net),0);
   h+=`<h2>Revenus</h2>
-  <div class="two" style="margin-bottom:12px"><button class="btn" onclick="openInc()">+ Revenu</button><button class="btn" onclick="openFraisPro()">+ Frais pro</button></div>`;
-  const mois=Object.keys(parM).sort().reverse();
-  h+=mois.length?mois.map(k=>{
-    const t=parM[k].filter(i=>!i.hors_budget).reduce((s,i)=>s+Number(i.montant_net),0);
-    const p=parM[k].filter(i=>i.hors_budget).reduce((s,i)=>s+Number(i.montant_net),0);
-    return `<div class="row"><div class="ic">💰</div>
-      <div class="mid"><div class="t">${new Date(k+'T00:00:00').toLocaleDateString('fr-FR',{month:'long',year:'numeric'})}</div>
-      <div class="s">${parM[k].map(i=>esc(i.source)).join(' + ')}${p?` · dont ${eur0(p)} hors budget`:''}</div></div>
-      <div class="amt pos">${eur(t)}</div></div>`;
-  }).join('') : `<div class="empty">Ton salaire varie : saisis-le chaque mois.</div>`;
+  <div class="two" style="margin-bottom:12px">
+    <button class="btn dash" onclick="openInc()">${ic('plus',18)} Revenu</button>
+    <button class="btn dash" onclick="openFraisPro()">${ic('plus',18)} Frais pro</button></div>`;
 
+  const now=new Date();
+  const six=[...Array(6)].map((_,k)=>new Date(now.getFullYear(),now.getMonth()-5+k,1));
+  const vals=six.map(d=>net(moisKey(d)));
+  const mxv=Math.max(...vals,1);
+  if(vals.some(v=>v>0)){
+    h+=`<div class="card" style="margin-bottom:10px"><div class="k">6 derniers mois</div>
+      <div class="histo">${six.map((d,k)=>`<div>
+        <i class="${k===5?'on':''}" style="height:${Math.max(3,Math.round(vals[k]/mxv*100))}%" title="${eur0(vals[k])}"></i>
+        <u>${d.toLocaleDateString('fr-FR',{month:'short'}).replace('.','')}</u></div>`).join('')}</div>
+      <div class="n">plus haut : ${eur0(mxv)}</div></div>`;
+  }
+
+  const mois=Object.keys(parM).sort().reverse();
+  h+=mois.length?`<div class="list">`+mois.map(k=>{
+    const t=net(k);
+    const pp=parM[k].filter(i=>i.hors_budget).reduce((s,i)=>s+Number(i.montant_net),0);
+    return `<div class="row"><div class="ic" style="background:var(--lime-bg);color:var(--lime)">${ic('wallet',18)}</div>
+      <div class="mid"><div class="t">${new Date(k+'T00:00:00').toLocaleDateString('fr-FR',{month:'long',year:'numeric'})}</div>
+      <div class="s">${parM[k].map(i=>esc(i.source)).join(' + ')}${pp?` · dont ${eur0(pp)} hors budget`:''}</div></div>
+      <div class="amt pos">${eur(t)}</div></div>`;
+  }).join('')+`</div>` : `<div class="empty">Ton salaire varie : saisis-le chaque mois.</div>`;
+
+  // --- frais pro ---
   h+=`<h2>Frais pro Generali</h2>`;
-  h+=(D.pro||[]).length?D.pro.map(p=>{
+  h+=(D.pro||[]).length?`<div class="list">`+D.pro.map(p=>{
     const nm=new Date(p.mois+'T00:00:00').toLocaleDateString('fr-FR',{month:'long',year:'numeric'});
-    const ic=p.statut==='sans_frais'?'—':(p.statut==='recu'?'✅':'⏳');
-    let s;
-    if(p.statut==='sans_frais') s='aucun frais ce mois-là';
-    else if(p.statut==='recu') s=`reçu ${eur0(Number(p.montant_recu||p.montant))}`+(p.date_virement_n26?` · ${eur0(Number(p.montant_vire_n26))} virés sur N26`:' · virement N26 à saisir');
-    else s=`déclaré · virement attendu le ${p.date_virement_prevue?new Date(p.date_virement_prevue+'T00:00:00').toLocaleDateString('fr-FR',{day:'numeric',month:'short'}):'?'}`;
-    return `<div class="row"><div class="ic">${ic}</div>
-      <div class="mid"><div class="t">${nm}</div><div class="s">${s}</div></div>
+    let st,col,bg;
+    if(p.statut==='sans_frais'){ st=ic('dash',18); col='var(--faint)'; bg='var(--panel2)' }
+    else if(p.statut==='recu'){ st=ic('check',18); col='var(--lime)'; bg='var(--lime-bg)' }
+    else { st=ic('clock',18); col='var(--amber)'; bg='var(--amber-bg)' }
+    let sub;
+    if(p.statut==='sans_frais') sub='aucun frais ce mois-là';
+    else if(p.statut==='recu') sub=`reçu ${eur0(Number(p.montant_recu||p.montant))}`+(p.date_virement_n26?` · ${eur0(Number(p.montant_vire_n26))} virés sur N26`:' · virement N26 à saisir');
+    else sub=`déclaré · virement attendu le ${p.date_virement_prevue?new Date(p.date_virement_prevue+'T00:00:00').toLocaleDateString('fr-FR',{day:'numeric',month:'short'}):'?'}`;
+    return `<div class="row"><div class="ic" style="background:${bg};color:${col}">${st}</div>
+      <div class="mid"><div class="t">${nm}</div><div class="s">${sub}</div></div>
       <div class="amt ${p.montant?'pos':''}">${p.montant?eur(Number(p.montant)):''}</div>
-      ${p.statut==='recu'&&!p.date_virement_n26?`<button class="chip" style="padding:5px 9px" onclick="openVirN26('${p.id}')">N26</button>`:''}
-      ${p.statut==='declare'?`<button class="chip" style="padding:5px 9px" onclick="openFraisPro('${p.mois}')">✎</button>`:''}</div>`;
-  }).join('') : `<div class="empty">Rien encore — le rappel arrive le ${Number(D.set.jour_rappel_frais_pro||15)} du mois.</div>`;
+      ${p.statut==='recu'&&!p.date_virement_n26?`<button class="mini ok" style="width:auto;padding:0 10px;font:600 12px Geist,sans-serif" onclick="openVirN26('${p.id}')">N26</button>`:''}
+      ${p.statut==='declare'?`<button class="mini" onclick="openFraisPro('${p.mois}')" aria-label="Modifier">${ic('edit',15)}</button>`:''}</div>`;
+  }).join('')+`</div>` : `<div class="empty">Rien encore — le rappel arrive le ${Number(D.set.jour_rappel_frais_pro||15)} du mois.</div>`;
   return h;
 }
 
@@ -742,69 +906,88 @@ function vSet(){
   const jour=new Date().getDate();
   const moisCourant=new Date().toISOString().slice(0,7)+'-01';
   const paieFaite=D.inc.some(i=>i.mois===moisCourant);
-  let h='';
+  let h=hd('Configuration','Réglages');
   const an=new Date().getFullYear(), moisImpots=Number(D.set.mois_rappel_impots||7);
   const impotsFait=D.rec.some(r=>r.nom.includes(`revenus ${an-1}`)) ||
                    (D.set.impots_traites_an && Number(D.set.impots_traites_an)===an);
   if(new Date().getMonth()+1>=moisImpots && new Date().getMonth()+1<9 && !impotsFait)
-    h+=`<div class="empty" style="border-color:#64748b88;color:var(--muted);margin-bottom:12px">🧾 Régularisation d'impôt sur le revenu : tu as reçu ton avis ?
-    <div style="margin-top:12px"><button class="btn" onclick="openImpots()">Saisir le montant</button></div></div>`;
+    h+=`<div class="banner"><div class="bic" style="background:var(--panel2);color:var(--muted)">${ic('receipt',20)}</div>
+      <div style="min-width:0"><div class="bt">Régularisation d'impôt sur le revenu</div>
+      <div class="bs">Tu as reçu ton avis ? Saisis le montant pour qu'il entre dans la projection.</div>
+      <div class="ba"><button onclick="openImpots()">Saisir le montant</button></div></div></div>`;
 
   if(jour>=Number(D.set.jour_rappel_frais_pro||15) && !proDuMois())
-    h+=`<div class="empty" style="border-color:#4f46e588;color:#a5b4fc;margin-bottom:12px">🧾 On est le ${jour} — as-tu déclaré tes frais pro Generali du mois ?
-    <div class="two" style="margin-top:12px"><button class="btn" onclick="openFraisPro()">Oui, saisir le montant</button><button class="btn" onclick="sansFraisPro()">Pas de frais ce mois-ci</button></div></div>`;
+    h+=`<div class="banner pro"><div class="bic">${ic('case',20)}</div>
+      <div style="min-width:0"><div class="bt">Frais pro Generali du mois</div>
+      <div class="bs">On est le ${jour} — as-tu déclaré tes frais ?</div>
+      <div class="ba"><button onclick="openFraisPro()">Oui, saisir le montant</button>
+      <button onclick="sansFraisPro()" style="background:var(--panel2);color:var(--txt)">Pas de frais</button></div></div></div>`;
   if(jour>=Number(D.set.jour_rappel_paie||25) && !paieFaite)
-    h+=`<div class="empty" style="border-color:#f59e0b66;color:var(--orange);margin-bottom:16px">⏰ On est le ${jour} — saisis ta fiche de paie du mois.
-    <div style="margin-top:12px"><button class="btn" onclick="openInc()">Saisir maintenant</button></div></div>`;
+    h+=`<div class="banner pay"><div class="bic">${ic('clock',20)}</div>
+      <div style="min-width:0"><div class="bt">Fiche de paie</div>
+      <div class="bs">On est le ${jour} — saisis ta paie du mois pour recaler la projection.</div>
+      <div class="ba"><button onclick="openInc()">Saisir maintenant</button></div></div></div>`;
 
-  h+=`<h2>Comptes bancaires</h2>
-  <button class="btn" style="margin-bottom:12px" onclick="openAcc()">+ Ajouter un compte</button>`;
-  h+=D.acc.length?D.acc.map(a=>`<div class="row"><div class="ic">🏦</div>
+  const totSoldes=D.acc.reduce((s,a)=>s+Number(a.solde),0);
+  const abr=a=>String(a.banque||a.nom||'?').replace(/[^A-Za-zÀ-ÿ0-9]/g,'').slice(0,3).toUpperCase();
+  h+=`<h2>Comptes bancaires <span class="count">${eur0(totSoldes)}</span></h2>`;
+  h+=D.acc.length?`<div class="list">`+D.acc.map(a=>`<div class="row">
+    <div class="ic" style="background:${a.type==='epargne'?'var(--teal-bg)':'var(--blue-bg)'};color:${a.type==='epargne'?'var(--teal)':'var(--blue)'};font-size:11.5px">${abr(a)}</div>
     <div class="mid"><div class="t">${esc(a.nom)}</div><div class="s">${esc(a.banque||'')} · ${a.exclu_budget?'hors budget perso':(a.source==='ponto'?'synchronisé':'saisi à la main')}</div></div>
-    <div class="amt num ${Number(a.solde)<0?'neg':''}">${eur(Number(a.solde))}</div>
-    <button class="chip" style="padding:5px 9px" onclick="majSolde('${a.id}',${Number(a.solde)})">✎</button>
-    ${D.foyer?`<button class="chip" style="padding:5px 9px" title="${a.foyer_id?'Partagé':'Privé'}" onclick="togglePartage('${a.id}',${a.foyer_id?'true':'false'})">${a.foyer_id?'👥':'🔒'}</button>`:''}</div>`).join('')
+    <div class="amt ${Number(a.solde)<0?'neg':''}">${eur(Number(a.solde))}</div>
+    <button class="mini" onclick="majSolde('${a.id}',${Number(a.solde)})" aria-label="Modifier le solde">${ic('edit',15)}</button>
+    ${D.foyer?`<button class="mini" aria-label="${a.foyer_id?'Partagé avec le foyer':'Compte privé'}" onclick="togglePartage('${a.id}',${a.foyer_id?'true':'false'})" style="${a.foyer_id?'color:var(--blue);border-color:#2C4460':''}">${a.foyer_id?ic('users',15):ic('lock',15)}</button>`:''}</div>`).join('')+`</div>`
   : `<div class="empty">Ajoute ton compte courant et son solde actuel.</div>`;
+  h+=`<button class="btn dash" style="margin-top:10px" onclick="openAcc()">${ic('plus',18)} Ajouter un compte</button>`;
 
   h+=`<h2>Paramètres</h2><div class="card">
-    <label>Objectif d'épargne mensuel</label><input type="number" id="s_ep" value="${Number(D.set.objectif_epargne_mensuel||0)}" step="10">
-    <label>Seuil orange (prudence)</label><input type="number" id="s_or" value="${Number(D.set.seuil_orange??200)}" step="10">
-    <label>Seuil rouge (ça serre)</label><input type="number" id="s_ro" value="${Number(D.set.seuil_rouge??50)}" step="10">
-    <label>Jour de paie / rappel</label><input type="number" id="s_jr" value="${Number(D.set.jour_rappel_paie??25)}" min="1" max="28">
-    <label>Jour du rappel frais pro</label><input type="number" id="s_fp" value="${Number(D.set.jour_rappel_frais_pro??15)}" min="1" max="28">
-    <label>Virement Generali attendu (jours après déclaration)</label><input type="number" id="s_fd" value="${Number(D.set.frais_pro_delai_jours??5)}" min="0" max="30">
-    <label>Tolérance de rapprochement (€)</label><input type="number" id="s_ft" value="${Number(D.set.frais_pro_tolerance??5)}" step="1" min="0">
-    <button class="btn primary" onclick="saveSet()">Enregistrer</button></div>
+    <div class="field"><label>Objectif d'épargne mensuel</label><input type="number" id="s_ep" value="${Number(D.set.objectif_epargne_mensuel||0)}" step="10"></div>
+    <div class="two">
+      <div class="field"><label style="color:var(--amber)">Seuil orange</label><input type="number" id="s_or" value="${Number(D.set.seuil_orange??200)}" step="10" style="border-color:#6B5320"></div>
+      <div class="field"><label style="color:var(--coral)">Seuil rouge</label><input type="number" id="s_ro" value="${Number(D.set.seuil_rouge??50)}" step="10" style="border-color:#6B2F22"></div>
+      <div class="field"><label>Jour de paie</label><input type="number" id="s_jr" value="${Number(D.set.jour_rappel_paie??25)}" min="1" max="28"></div>
+      <div class="field"><label>Jour rappel frais pro</label><input type="number" id="s_fp" value="${Number(D.set.jour_rappel_frais_pro??15)}" min="1" max="28"></div>
+      <div class="field"><label>Délai virement Generali</label><input type="number" id="s_fd" value="${Number(D.set.frais_pro_delai_jours??5)}" min="0" max="30"></div>
+      <div class="field"><label>Tolérance rapprochement</label><input type="number" id="s_ft" value="${Number(D.set.frais_pro_tolerance??5)}" step="1" min="0"></div>
+    </div>
+    <button class="btn light" onclick="saveSet()">Enregistrer</button></div>
 
   <h2>Connexions</h2>
-  <div class="row"><div class="ic">🏦</div><div class="mid"><div class="t">Ponto — flux bancaire</div>
-    <div class="s">${!D.pontoCred ? 'identifiants non renseignés' : (()=>{const d=D.acc.filter(a=>a.derniere_sync).map(a=>new Date(a.derniere_sync)).sort((x,y)=>y-x)[0];
-      return d?`dernière synchro : ${d.toLocaleString('fr-FR',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}`:'connecté, pas encore synchronisé'})()}</div></div>
-    ${D.pontoCred?`<button class="chip" style="padding:6px 11px" onclick="syncPonto(true)">↻</button>`:''}</div>
-  <div class="two" style="margin-top:4px">
-    <button class="btn" onclick="openPonto()">${D.pontoCred?'Changer mes identifiants':'Renseigner mes identifiants'}</button>
+  <div class="list">
+    <div class="row"><div class="ic" style="background:var(--blue-bg);color:var(--blue)">${ic('bank',18)}</div>
+      <div class="mid"><div class="t">Ponto — flux bancaire</div>
+      <div class="s">${!D.pontoCred ? 'identifiants non renseignés' : (()=>{const d=D.acc.filter(a=>a.derniere_sync).map(a=>new Date(a.derniere_sync)).sort((x,y)=>y-x)[0];
+        return d?`dernière synchro : ${d.toLocaleString('fr-FR',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}`:'connecté, pas encore synchronisé'})()}</div></div>
+      ${D.pontoCred?`<button class="mini" onclick="syncPonto(true)" aria-label="Synchroniser maintenant" style="border-radius:50%">${ic('sync',15)}</button>`:''}</div>
+    <div class="row"><div class="ic" style="background:var(--panel2);color:var(--muted)">${ic('mail',18)}</div>
+      <div class="mid"><div class="t">Gmail — factures</div><div class="s">à brancher</div></div></div>
+    <div class="row"><div class="ic" style="background:var(--panel2);color:var(--muted)">${ic('doc',18)}</div>
+      <div class="mid"><div class="t">Digiposte — paie & impôts</div><div class="s">à brancher</div></div></div>
+  </div>
+  <div class="two" style="margin-top:10px">
+    <button class="btn" onclick="openPonto()">${D.pontoCred?'Changer les identifiants':'Renseigner les identifiants'}</button>
     <button class="btn" onclick="inventairePonto()">Lister mes comptes</button></div>
-  <div class="row"><div class="ic">📬</div><div class="mid"><div class="t">Gmail — factures</div><div class="s">à brancher</div></div></div>
-  <div class="row"><div class="ic">🗄</div><div class="mid"><div class="t">Digiposte — paie & impôts</div><div class="s">à brancher</div></div></div>
 
   <h2>Foyer${D.foyer?` <span class="count">${esc(D.foyer.nom)}</span>`:''}</h2>`;
   if(D.foyer){
     const nomDe=id=>{const p=D.profils.find(x=>x.id===id); return p?(p.full_name||p.email):'Membre'};
-    h+=D.membres.map(m=>`<div class="row"><div class="ic">${m.role==='proprietaire'?'★':'👥'}</div>
-      <div class="mid"><div class="t">${esc(nomDe(m.user_id))}</div><div class="s">${m.role==='proprietaire'?'propriétaire':'membre'}</div></div></div>`).join('');
-    h+=D.invits.map(i=>`<div class="row" style="opacity:.65"><div class="ic">✉</div>
-      <div class="mid"><div class="t">${esc(i.email)}</div><div class="s">invitation en attente — elle rejoindra à sa 1re connexion</div></div></div>`).join('');
-    h+=`<button class="btn" style="margin-top:4px" onclick="openInvit()">+ Inviter quelqu'un</button>
+    h+=`<div class="list">`+D.membres.map(m=>`<div class="row">
+      <div class="ic" style="background:var(--lime-bg);color:var(--lime)">${m.role==='proprietaire'?'★':ic('users',18)}</div>
+      <div class="mid"><div class="t">${esc(nomDe(m.user_id))}</div><div class="s">${m.role==='proprietaire'?'propriétaire':'membre'}</div></div></div>`).join('')
+    +D.invits.map(i=>`<div class="row" style="opacity:.7"><div class="ic" style="background:var(--panel2);color:var(--muted)">${ic('mail',18)}</div>
+      <div class="mid"><div class="t">${esc(i.email)}</div><div class="s">invitation en attente — elle rejoindra à sa 1re connexion</div></div></div>`).join('')+`</div>`;
+    h+=`<button class="btn dash" style="margin-top:10px" onclick="openInvit()">${ic('plus',18)} Inviter quelqu'un</button>
     <div class="note">Seuls les comptes rattachés au foyer sont partagés. Tes comptes perso restent privés.</div>`;
   } else {
-    h+=`<div class="empty">Aucun foyer. Crée-en un pour partager un compte avec quelqu'un.
-    <div style="margin-top:12px"><button class="btn" onclick="creerFoyer()">Créer un foyer</button></div></div>`;
+    h+=`<div class="empty">Aucun foyer. Crée-en un pour partager un compte avec quelqu'un.</div>
+      <button class="btn dash" style="margin-top:10px" onclick="creerFoyer()">${ic('plus',18)} Créer un foyer</button>`;
   }
 
   h+=`<h2>Compte</h2>
-  <div class="row"><div class="ic">👤</div><div class="mid"><div class="t">${esc(U?.email||'')}</div>
-    <div class="s">connecté via ${esc(U?.app_metadata?.provider==='google'?'Google':'e-mail')}</div></div></div>
-  <button class="btn danger" style="margin-top:4px" onclick="logout()">Se déconnecter</button>`;
+  <div class="list"><div class="row"><div class="avat" style="width:40px;height:40px">${((U&&U.email)||'').replace(/[^a-zA-Z]/g,'').slice(0,2).toUpperCase()||'MOI'}</div>
+    <div class="mid"><div class="t">${esc((U&&U.email)||'')}</div>
+    <div class="s">connecté via ${esc(U&&U.app_metadata&&U.app_metadata.provider==='google'?'Google':'e-mail')}</div></div></div></div>
+  <button class="btn danger" style="margin-top:10px" onclick="logout()">Se déconnecter</button>`;
   return h;
 }
 
@@ -814,12 +997,14 @@ async function classe(txId,catId,libelle){
   if(error) return toast(error.message);
   const motif=(libelle||'').toUpperCase().split(/[\s*]+/).filter(w=>w.length>3)[0];
   if(motif) await SB.from('categorization_rules').upsert({user_id:U.id,category_id:catId,motif},{onConflict:'user_id,motif'});
-  toast('Classé ✓'); load();
+  toast('Classé'); load();
 }
 
 function sheet(html,bloquant){
   const o=document.createElement('div');o.className='ovl';
-  o.innerHTML=`<div class="sheet">${html}</div>`;
+  const h=html.replace(/^\s*<h3>([\s\S]*?)<\/h3>/,(m,t)=>`<div class="shead"><h3>${t}</h3>${bloquant?'':`<button class="closex" aria-label="Fermer">${ic('x',18)}</button>`}</div>`);
+  o.innerHTML=`<div class="sheet"><div class="handle"></div>${h}</div>`;
+  const cx=o.querySelector('.closex'); if(cx) cx.onclick=()=>o.remove();
   if(!bloquant) o.onclick=e=>{if(e.target===o)o.remove()};
   document.body.appendChild(o);return o;
 }
@@ -840,20 +1025,20 @@ function openDepMois(cat){
   const tot=ops.reduce((s,t)=>s+Math.abs(Number(t.montant)),0);
   const mois=new Date().toLocaleDateString('fr-FR',{month:'long',year:'numeric'});
   let h=`<h3>${cat?esc(cat):'Dépenses du mois'} <span class="count">${eur0(tot)}</span></h3>
-    <div style="color:var(--dim);font-size:12.5px;margin:-10px 0 14px">${ops.length} opération${ops.length>1?'s':''} · ${mois}</div>`;
+    <div class="over" style="margin:-8px 0 14px;color:var(--faint)">${ops.length} opération${ops.length>1?'s':''} · ${mois}</div>`;
   if(!ops.length){ sheet(h+`<div class="empty">Aucune dépense ce mois-ci.</div>`); return }
   let jour='';
-  ops.forEach(t=>{
+  ops.forEach((t,k)=>{
     const j=new Date(t.date_operation+'T00:00:00').toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'});
-    if(j!==jour){h+=`<div style="color:var(--dim);font-size:11.5px;font-weight:600;margin:14px 0 7px;text-transform:uppercase;letter-spacing:.5px">${j}</div>`;jour=j}
-    const c=D.catById[t.category_id];
-    const a=D.acc.find(x=>x.id===t.account_id);
-    h+=`<div class="row"><div class="ic" style="background:${c?c.couleur+'22':'#1b2430'};color:${c?c.couleur:'var(--dim)'}">${t.statut==='a_valider'?'?':'●'}</div>
+    if(j!==jour){ h+=`${jour?'</div>':''}<div class="dayhead"><div class="over">${j}</div></div><div class="list">`; jour=j }
+    const c=D.catById[t.category_id], a=D.acc.find(x=>x.id===t.account_id);
+    const acl=t.statut==='a_valider'||!c;
+    h+=`<div class="row"><div class="ic" style="background:${acl?'var(--amber-bg)':(c.couleur?c.couleur+'22':'var(--panel2)')};color:${acl?'var(--amber)':(c.couleur||'var(--muted)')}">${acl?ic('quest',18):esc((c.nom||'?').trim().charAt(0).toUpperCase())}</div>
       <div class="mid"><div class="t">${esc(t.libelle)}</div>
-      <div class="s">${cat?(a?esc(a.nom):'—'):(c?esc(c.nom):'à classer')}</div></div>
+      <div class="s">${cat?(a?esc(a.nom):'—'):(acl?'à classer':esc(c.nom))}</div></div>
       <div class="amt neg">${eur(Number(t.montant))}</div></div>`;
   });
-  sheet(h);
+  sheet(h+'</div>');
 }
 
 function openASortir(){
@@ -861,86 +1046,159 @@ function openASortir(){
   const fm=new Date(new Date().getFullYear(),new Date().getMonth()+1,0);
   const nm=fm.toLocaleDateString('fr-FR',{month:'long',year:'numeric'});
   let h=`<h3>À sortir d'ici la fin du mois <span class="count">${eur0(m.totalAVenirMois)}</span></h3>
-    <div style="color:var(--dim);font-size:12.5px;margin:-10px 0 14px">${l.length} échéance${l.length>1?'s':''} · jusqu'au ${fm.getDate()} ${nm}</div>`;
+    <div class="over" style="margin:-8px 0 14px;color:var(--faint)">${l.length} échéance${l.length>1?'s':''} · jusqu'au ${fm.getDate()} ${nm}</div>`;
   if(!l.length){ sheet(h+`<div class="empty">Plus rien à sortir d'ici la fin du mois.</div>`); return }
   let jour='';
   l.forEach(p=>{
     const j=p.date.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'});
-    if(j!==jour){h+=`<div style="color:var(--dim);font-size:11.5px;font-weight:600;margin:14px 0 7px;text-transform:uppercase;letter-spacing:.5px">${j}</div>`;jour=j}
-    h+=`<div class="row"><div class="ic">${p.facture?'📄':p.abo?'🔁':'🏠'}</div>
+    if(j!==jour){ h+=`${jour?'</div>':''}<div class="dayhead"><div class="over">${j}</div></div><div class="list">`; jour=j }
+    h+=`<div class="row"><div class="datepill"><i>${p.date.getDate()}</i><u>${p.date.toLocaleDateString('fr-FR',{month:'short'}).replace('.','')}</u></div>
       <div class="mid"><div class="t">${esc(p.nom)}</div>
-      <div class="s">${p.facture?'facture':(p.abo?'abonnement':'charge')}${p.freq?' · '+esc(p.freq):''}</div></div>
+      <div class="s">${p.facture?'facture':(p.abo?'abonnement':'charge fixe')}${p.freq?' · '+esc(p.freq):''}</div></div>
       <div class="amt neg">${eur(-p.montant)}</div></div>`;
   });
-  h+=`<div class="note">Solde courant actuel ${eur0(m.solde)} → ${eur0(m.solde-m.totalAVenirMois)} une fois tout passé.</div>`;
+  h+=`</div><div class="note">Solde courant actuel ${eur0(m.solde)} → ${eur0(m.solde-m.totalAVenirMois)} une fois tout passé.</div>`;
   sheet(h);
 }
 
 function openPrevoir(){
   const ap=aPrevoir();
-  const ICO={fixe:'🏠',abo_detecte:'?',variable:'🛒'};
+  const ICO={fixe:'bank',abo_detecte:'quest',variable:'out'};
+  const COL={fixe:['var(--blue-bg)','var(--blue)'],abo_detecte:['var(--amber-bg)','var(--amber)'],variable:['var(--coral-bg)','var(--coral)']};
   const TTL={fixe:'Charges fixes',abo_detecte:'Abonnements détectés',variable:'Dépenses contraintes estimées'};
   const nm=ap.debut.toLocaleDateString('fr-FR',{month:'long',year:'numeric'});
   let h=`<h3>À prévoir — ${nm} <span class="count">${eur0(ap.total)}</span></h3>
-    <div style="color:var(--dim);font-size:12.5px;margin:-10px 0 14px">du 1er au ${ap.fin.getDate()} ${ap.nomMois} · frais pro Generali exclus (compte N26)</div>`;
+    <div class="over" style="margin:-8px 0 14px;color:var(--faint)">du 1er au ${ap.fin.getDate()} ${ap.nomMois} · frais pro Generali exclus (compte N26)</div>`;
   ['fixe','abo_detecte','variable'].forEach(t=>{
     const l=ap.lignes.filter(x=>x.type===t); if(!l.length) return;
     const tot=l.reduce((s,x)=>s+x.montant,0);
-    h+=`<h2>${TTL[t]} <span class="count">${eur0(tot)}</span></h2>`;
-    h+=l.map(x=>`<div class="row"><div class="ic">${x.abo?'🔁':ICO[t]}</div>
+    h+=`<h2>${TTL[t]} <span class="count">${eur0(tot)}</span></h2><div class="list">`;
+    h+=l.map(x=>`<div class="row"><div class="ic" style="background:${COL[t][0]};color:${COL[t][1]}">${ic(x.abo?'repeat':ICO[t],18)}</div>
       <div class="mid"><div class="t">${esc(x.nom)}</div>
       <div class="s">${x.date&&t!=='variable'?x.date.toLocaleDateString('fr-FR',{day:'numeric',month:'short'}):''}${x.note?(x.date&&t!=='variable'?' · ':'')+esc(x.note):''}</div></div>
-      <div class="amt neg">${eur(-x.montant)}</div></div>`).join('');
+      <div class="amt neg">${eur(-x.montant)}</div></div>`).join('')+`</div>`;
   });
   h+=`<div class="note">Resto, loisirs, shopping et santé ne sont pas provisionnés : ils dépendent de ce qu'il reste.</div>`;
   sheet(h);
 }
 
+function openCreer(){
+  const o=sheet(`<h3>Créer</h3>
+    <div class="tiles">
+      <button class="tile hero-tile" id="k_op"><div class="tic">${ic('plus',22)}</div><div class="tt">Nouvelle opération</div><div class="ts">Une dépense ou une rentrée ponctuelle</div></button>
+      <button class="tile" ><div class="tic" style="background:var(--blue-bg);color:var(--blue)">${ic('repeat',22)}</div><div class="tt">Charge récurrente</div><div class="ts">Loyer, abonnement…</div></button>
+      <button class="tile" ><div class="tic" style="background:var(--lime-bg);color:var(--lime)">${ic('wallet',22)}</div><div class="tt">Revenu du mois</div><div class="ts">Salaire, prime</div></button>
+      <button class="tile" ><div class="tic" style="background:var(--indigo-bg);color:var(--indigo)">${ic('case',22)}</div><div class="tt">Frais pro</div><div class="ts">Déclaration Generali</div></button>
+      <button class="tile" ><div class="tic" style="background:var(--teal-bg);color:var(--teal)">${ic('card',22)}</div><div class="tt">Compte bancaire</div><div class="ts">Courant ou épargne</div></button>
+      <button class="tile" ><div class="tic" style="background:var(--amber-bg);color:var(--amber)">${ic('receipt',22)}</div><div class="tt">Impôts</div><div class="ts">Régularisation</div></button>
+      <button class="tile" ><div class="tic" style="background:#241C33;color:var(--violet)">${ic('users',22)}</div><div class="tt">Foyer</div><div class="ts">Inviter ou créer</div></button>
+    </div>`);
+  const pick=(f)=>{o.remove(); f()};
+  const t=o.querySelectorAll('.tile');
+  t[0].onclick=()=>pick(openAdd);
+  t[1].onclick=()=>pick(openRec);
+  t[2].onclick=()=>pick(openInc);
+  t[3].onclick=()=>pick(openFraisPro);
+  t[4].onclick=()=>pick(openAcc);
+  t[5].onclick=()=>pick(openImpots);
+  t[6].onclick=()=>pick(D.foyer?openInvit:creerFoyer);
+}
 function openAdd(){
+  let dep=true;
   const o=sheet(`<h3>Nouvelle opération</h3>
-    <label>Libellé</label><input id="a_lib" placeholder="Courses Intermarché">
-    <div class="two"><div><label>Montant (− pour une dépense)</label><input type="number" id="a_mt" step="0.01" inputmode="decimal" placeholder="-42.50"></div>
-    <div><label>Date</label><input type="date" id="a_dt" value="${new Date().toISOString().slice(0,10)}"></div></div>
-    <label>Catégorie</label><select id="a_cat">${D.cats.map(c=>`<option value="${c.id}">${esc(c.nom)}</option>`).join('')}</select>
-    <label>Compte</label><select id="a_acc">${D.acc.map(a=>`<option value="${a.id}">${esc(a.nom)}</option>`).join('')||'<option value="">—</option>'}</select>
-    <button class="btn primary" id="a_go">Enregistrer</button>`);
+    <div class="seg" id="a_sg">
+      <button type="button" class="on neg" data-k="dep">Dépense</button>
+      <button type="button" data-k="rev">Rentrée</button></div>
+    <div class="over" style="text-align:center">Montant</div>
+    <input type="number" id="a_mt" class="bigin" step="0.01" inputmode="decimal" placeholder="0,00" style="color:var(--coral)">
+    <div class="field"><label>Libellé</label><input id="a_lib" placeholder="Courses Intermarché"></div>
+    <div class="two">
+      <div class="field"><label>Date</label><input type="date" id="a_dt" value="${new Date().toISOString().slice(0,10)}"></div>
+      <div class="field"><label>Compte</label><select id="a_acc">${D.acc.map(a=>`<option value="${a.id}">${esc(a.nom)}</option>`).join('')||'<option value="">—</option>'}</select></div></div>
+    <label>Catégorie</label>
+    <select id="a_cat" class="hidden">${D.cats.map(c=>`<option value="${c.id}">${esc(c.nom)}</option>`).join('')}</select>
+    <div class="chips" id="a_ch" style="margin-bottom:4px">${D.cats.map(c=>
+      `<button type="button" class="chip" data-id="${c.id}" data-rev="${c.type==='revenu'?1:0}"><b style="background:${c.couleur||'#9BA3AD'}"></b>${esc(c.nom)}</button>`).join('')}</div>
+    <button class="btn primary" id="a_go" style="margin-top:16px">${ic('check',18)} Enregistrer</button>`);
+
+  const sel=o.querySelector('#a_cat'), mt=o.querySelector('#a_mt');
+  // chips <-> select conserve
+  const syncChips=()=>{
+    o.querySelectorAll('#a_ch .chip').forEach(b=>{
+      const ok=(b.dataset.rev==='1')!==dep;
+      b.classList.toggle('hidden',!ok);
+      b.classList.toggle('on',b.dataset.id===sel.value);
+    });
+    const vis=[...o.querySelectorAll('#a_ch .chip:not(.hidden)')];
+    if(vis.length && !vis.some(b=>b.dataset.id===sel.value)){ sel.value=vis[0].dataset.id; }
+    o.querySelectorAll('#a_ch .chip').forEach(b=>b.classList.toggle('on',b.dataset.id===sel.value));
+  };
+  o.querySelectorAll('#a_ch .chip').forEach(b=>b.onclick=()=>{ sel.value=b.dataset.id; syncChips() });
+  o.querySelectorAll('#a_sg button').forEach(b=>b.onclick=()=>{
+    dep=b.dataset.k==='dep';
+    o.querySelectorAll('#a_sg button').forEach(x=>{
+      x.classList.toggle('on',x===b);
+      x.classList.toggle('neg',x.dataset.k==='dep');
+      x.classList.toggle('pos',x.dataset.k==='rev');
+    });
+    mt.style.color=dep?'var(--coral)':'var(--lime)';
+    syncChips();
+  });
+  syncChips();
+
   o.querySelector('#a_go').onclick=async()=>{
-    const montant=parseFloat(o.querySelector('#a_mt').value);
-    if(isNaN(montant)) return toast('Montant manquant');
+    const brut=parseFloat(mt.value);
+    if(isNaN(brut)) return toast('Montant manquant');
+    const montant=dep?-Math.abs(brut):Math.abs(brut);   // le signe vient du segmented
     const acc=o.querySelector('#a_acc').value||null;
     const {error}=await SB.from('transactions').insert({user_id:U.id,libelle:o.querySelector('#a_lib').value||'Opération',
-      montant,date_operation:o.querySelector('#a_dt').value,category_id:o.querySelector('#a_cat').value,
+      montant,date_operation:o.querySelector('#a_dt').value,category_id:sel.value,
       account_id:acc,statut:'confirmee',source:'manuel'});
     if(error) return toast(error.message);
     if(acc){const a=D.acc.find(x=>x.id===acc); if(a) await SB.from('accounts').update({solde:Number(a.solde)+montant}).eq('id',acc)}
-    o.remove(); toast('Ajouté ✓'); load();
+    o.remove(); toast('Ajouté'); load();
   };
 }
 
 function adopterAbo(j){ const a=JSON.parse(j); openRec({nom:a.nom,montant:a.montant,jour:a.jour,abo:true}); }
 function openRec(pre){
   pre=pre||{};
-  const o=sheet(`<h3>Charge récurrente</h3>
-    <label>Nom</label><input id="r_n" placeholder="Loyer, Netflix, assurance…" value="${esc(pre.nom||'')}">
-    <div class="two"><div><label>Montant</label><input type="number" id="r_m" step="0.01" inputmode="decimal" value="${pre.montant||''}"></div>
-    <div><label>Jour (si mensuel)</label><input type="number" id="r_j" min="1" max="31" value="${pre.jour||5}"></div></div>
-    <label>Fréquence</label><select id="r_f">
-      <option value="mensuel">Mensuel</option><option value="bimestriel">Tous les 2 mois</option>
-      <option value="trimestriel">Trimestriel</option><option value="semestriel">Semestriel</option><option value="annuel">Annuel</option></select>
-    <label>Prochaine échéance (si pas mensuel)</label><input type="date" id="r_e">
-    <label>Catégorie</label><select id="r_c">${D.cats.filter(c=>c.type!=='revenu').map(c=>`<option value="${c.id}">${esc(c.nom)}</option>`).join('')}</select>
-    <label style="display:flex;gap:8px;align-items:center;text-transform:none;font-size:14px;letter-spacing:0"><input type="checkbox" id="r_a" style="width:auto;margin:0"${pre.abo?' checked':''}> C'est un abonnement</label>
-    <button class="btn primary" id="r_go">Enregistrer</button>`);
+  const FREQ=[['mensuel','Mensuel'],['bimestriel','2 mois'],['trimestriel','Trimestre'],['semestriel','Semestre'],['annuel','Annuel']];
+  const o=sheet(`<h3><span class="hbadge" style="background:var(--blue-bg);color:var(--blue)">${ic('repeat',18)}</span>Charge récurrente</h3>
+    <div class="field"><label>Nom</label><input id="r_n" placeholder="Loyer, Netflix, assurance…" value="${esc(pre.nom||'')}"></div>
+    <div class="two">
+      <div class="field"><label>Montant</label><input type="number" id="r_m" step="0.01" inputmode="decimal" placeholder="0,00" value="${pre.montant||''}" style="color:var(--coral)"></div>
+      <div class="field"><label>Jour du mois</label><input type="number" id="r_j" min="1" max="31" value="${pre.jour||5}"></div></div>
+    <label>Fréquence</label>
+    <select id="r_f" class="hidden">${FREQ.map(([k,l])=>`<option value="${k}">${l}</option>`).join('')}</select>
+    <div class="chips" id="r_fc">${FREQ.map(([k,l])=>`<button type="button" class="chip${k==='mensuel'?' on':''}" data-k="${k}">${l}</button>`).join('')}</div>
+    <div class="note" id="r_li"></div>
+    <div class="field hidden" id="r_ew" style="margin-top:12px"><label>Prochaine échéance</label><input type="date" id="r_e"></div>
+    <div class="field" style="margin-top:12px"><label>Catégorie</label><select id="r_c">${D.cats.filter(c=>c.type!=='revenu').map(c=>`<option value="${c.id}">${esc(c.nom)}</option>`).join('')}</select></div>
+    <label class="tog" for="r_a"><div><div class="tl">C'est un abonnement</div><div class="ts">Suivi à part, et compté sur l'année</div></div>
+      <input type="checkbox" id="r_a"${pre.abo?' checked':''}><span class="track"></span></label>
+    <button class="btn primary" id="r_go">${ic('check',18)} Enregistrer</button>`);
   if(pre.cat) o.querySelector('#r_c').value=pre.cat;
+
+  const fsel=o.querySelector('#r_f'), mt=o.querySelector('#r_m'), ew=o.querySelector('#r_ew');
+  const maj=()=>{
+    const f=fsel.value, m=parseFloat(mt.value);
+    o.querySelectorAll('#r_fc .chip').forEach(b=>b.classList.toggle('on',b.dataset.k===f));
+    ew.classList.toggle('hidden',f==='mensuel');
+    o.querySelector('#r_li').textContent = (!isNaN(m)&&f!=='mensuel') ? `Soit ${eur0(parMois({montant:m,frequence:f}))} / mois lissé` : (f==='mensuel'?'Prélevé chaque mois.':'');
+  };
+  o.querySelectorAll('#r_fc .chip').forEach(b=>b.onclick=()=>{ fsel.value=b.dataset.k; maj() });
+  mt.oninput=maj; maj();
+
   o.querySelector('#r_go').onclick=async()=>{
-    const m=parseFloat(o.querySelector('#r_m').value); if(isNaN(m)) return toast('Montant manquant');
-    const f=o.querySelector('#r_f').value, e=o.querySelector('#r_e').value||null;
+    const m=parseFloat(mt.value); if(isNaN(m)) return toast('Montant manquant');
+    const f=fsel.value, e=o.querySelector('#r_e').value||null;
     if(f!=='mensuel'&&!e) return toast('Indique la prochaine échéance');
     const {error}=await SB.from('recurring_charges').insert({user_id:U.id,nom:o.querySelector('#r_n').value||'Charge',montant:m,
       jour_prelevement:parseInt(o.querySelector('#r_j').value)||1,frequence:f,prochaine_echeance:e,
       category_id:o.querySelector('#r_c').value,est_abonnement:o.querySelector('#r_a').checked});
     if(error) return toast(error.message);
-    o.remove(); toast('Charge ajoutée ✓'); load();
+    o.remove(); toast('Charge ajoutée'); load();
   };
 }
 async function delRec(id,nom){
@@ -950,13 +1208,33 @@ async function delRec(id,nom){
 }
 
 function openInc(pro){
-  const o=sheet(`<h3>${pro?'Frais pro Generali':'Revenu du mois'}</h3>
-    ${pro?`<div class="note" style="padding:0 0 12px">Montant remboursé par Generali. Hors budget perso : à virer sur N26 le 18.</div>`:''}
-    <label>Mois concerné</label><input type="month" id="i_m" value="${new Date().toISOString().slice(0,7)}">
-    <label>Montant ${pro?'des frais':'net'}</label><input type="number" id="i_v" step="0.01" inputmode="decimal" placeholder="${pro?'450.00':'2850.00'}">
-    ${pro?'':`<label>Source</label><input id="i_s" value="salaire">
-    <label>Dont commissions (optionnel)</label><input type="number" id="i_c" step="0.01" inputmode="decimal">`}
-    <button class="btn primary" id="i_go">Enregistrer</button>`);
+  const o=sheet(`<h3><span class="hbadge" style="background:${pro?'var(--indigo-bg)':'var(--lime-bg)'};color:${pro?'var(--indigo)':'var(--lime)'}">${ic(pro?'case':'wallet',18)}</span>${pro?'Frais pro Generali':'Revenu du mois'}</h3>
+    ${pro?`<div class="infobox">${ic('info',18)}<div>Montant remboursé par Generali. Hors budget perso : à virer sur N26 le 18.</div></div>`:''}
+    <div class="card" style="text-align:center;padding:18px 16px 16px;margin-bottom:14px">
+      <div class="over">Montant ${pro?'des frais':'net'}</div>
+      <input type="number" id="i_v" class="bigin" step="0.01" inputmode="decimal" placeholder="0,00" style="font-size:48px;color:${pro?'var(--indigo)':'var(--lime)'}">
+      ${pro?'':`<div class="stack" id="i_bar" style="margin:4px 0 8px"><i style="width:100%;background:var(--lime)"></i></div>
+      <div class="legend" style="grid-template-columns:1fr 1fr"><div><b style="background:var(--lime)"></b>fixe <span id="i_lf" style="margin-left:auto;font-family:'Geist Mono',monospace;font-size:12px;color:var(--txt)">—</span></div>
+      <div><b style="background:var(--blue)"></b>commissions <span id="i_lc" style="margin-left:auto;font-family:'Geist Mono',monospace;font-size:12px;color:var(--txt)">—</span></div></div>`}
+    </div>
+    <div class="field"><label>Mois concerné</label><input type="month" id="i_m" value="${new Date().toISOString().slice(0,7)}"></div>
+    ${pro?'':`<div class="two"><div class="field"><label>Source</label><input id="i_s" value="salaire"></div>
+    <div class="field"><label>Dont commissions</label><input type="number" id="i_c" step="0.01" inputmode="decimal" placeholder="0,00"></div></div>`}
+    <div class="note" style="padding-bottom:12px">Remplace la saisie existante pour ce mois et cette source.</div>
+    <button class="btn ${pro?'indigo':'primary'}" id="i_go">${ic('check',18)} Enregistrer</button>`);
+
+  if(!pro){
+    const v=o.querySelector('#i_v'), c=o.querySelector('#i_c');
+    const maj=()=>{
+      const net=parseFloat(v.value)||0, com=Math.min(Math.abs(parseFloat(c.value)||0),net);
+      const pc=net?Math.round(com/net*100):0;
+      o.querySelector('#i_bar').innerHTML=`<i style="width:${100-pc}%;background:var(--lime)"></i><i style="width:${pc}%;background:var(--blue)"></i>`;
+      o.querySelector('#i_lf').textContent=eur0(net-com);
+      o.querySelector('#i_lc').textContent=eur0(com);
+    };
+    v.oninput=maj; c.oninput=maj; maj();
+  }
+
   o.querySelector('#i_go').onclick=async()=>{
     const v=parseFloat(o.querySelector('#i_v').value); if(isNaN(v)) return toast('Montant manquant');
     const com=pro?NaN:parseFloat(o.querySelector('#i_c').value);
@@ -964,7 +1242,7 @@ function openInc(pro){
       source:pro?'frais pro':(o.querySelector('#i_s').value||'salaire'),hors_budget:!!pro,
       confirme:true,detail:isNaN(com)?null:{commissions:com}},{onConflict:'user_id,mois,source'});
     if(error) return toast(error.message);
-    o.remove(); toast('Revenu enregistré ✓'); load();
+    o.remove(); toast('Revenu enregistré'); load();
   };
 }
 
@@ -987,8 +1265,8 @@ function rappelFraisPro(){
   if(proDuMois()) return;            // deja repondu pour ce mois : remise a zero le 15 suivant
   rappelProVu=true;
   const nm=new Date().toLocaleDateString('fr-FR',{month:'long',year:'numeric'});
-  const o=sheet(`<h3>Frais pro Generali</h3>
-    <div class="note" style="padding:0 0 14px">On est le ${jour}. As-tu déclaré tes frais pro de <b>${nm}</b> ?</div>
+  const o=sheet(`<h3><span class="hbadge" style="background:var(--indigo-bg);color:var(--indigo)">${ic('case',18)}</span>Frais pro Generali</h3>
+    <div class="infobox">${ic('info',18)}<div>On est le ${jour}. As-tu déclaré tes frais pro de <b>${nm}</b> ?</div></div>
     <button class="btn primary" id="p_o">Oui — saisir le montant</button>
     <button class="btn" id="p_t" style="margin-top:8px">Pas encore</button>
     <button class="btn" id="p_s" style="margin-top:8px">Pas de frais ce mois-ci</button>`,true);
@@ -1009,12 +1287,21 @@ function openFraisPro(mois){
   const m=mois||moisISO(new Date());
   const p=proDuMois(m)||{};
   const d=new Date(); d.setDate(d.getDate()+Number(D.set.frais_pro_delai_jours??5));
-  const o=sheet(`<h3>Frais pro déclarés</h3>
-    <div class="note" style="padding:0 0 12px">Ce montant devient une <b>entrée prévue</b> (virement Generali) dans la projection, puis se rapproche tout seul du virement réel. Le virement vers N26 reste libre : tu le saisiras quand tu le feras.</div>
-    <label>Mois concerné</label><input type="month" id="f_m" value="${m.slice(0,7)}">
-    <label>Montant déclaré</label><input type="number" id="f_v" step="0.01" inputmode="decimal" value="${p.montant??''}" placeholder="450.00">
-    <label>Virement attendu le</label><input type="date" id="f_d" value="${p.date_virement_prevue||d.toISOString().slice(0,10)}">
-    <button class="btn primary" id="f_go">Enregistrer</button>`);
+  const et=p.statut==='recu'?(p.date_virement_n26?3:2):(p.statut==='declare'?1:0);
+  const pas=[['Déclaré',1],['Virement Generali',2],['Viré sur N26',3]];
+  const o=sheet(`<h3><span class="hbadge" style="background:var(--indigo-bg);color:var(--indigo)">${ic('case',18)}</span>Frais pro déclarés</h3>
+    <div class="stepper">${pas.map(([l,n])=>`<div class="${et>=n?'on':''}"><div class="sd">${et>n?'✓':n}</div><div class="sl">${l}</div></div>`).join('')}</div>
+    <div class="infobox">${ic('info',18)}<div>Ce montant devient une <b>entrée prévue</b> (virement Generali) dans la projection, puis se rapproche tout seul du virement réel. Le virement vers N26 reste libre : tu le saisiras quand tu le feras.</div></div>
+    <div class="card" style="text-align:center;padding:18px 16px 14px;margin-bottom:14px">
+      <div class="over">Montant déclaré</div>
+      <input type="number" id="f_v" class="bigin" step="0.01" inputmode="decimal" value="${p.montant??''}" placeholder="0,00" style="font-size:48px;color:var(--indigo)">
+    </div>
+    <div class="two">
+      <div class="field"><label>Mois concerné</label><input type="month" id="f_m" value="${m.slice(0,7)}"></div>
+      <div class="field"><label>Virement attendu le</label><input type="date" id="f_d" value="${p.date_virement_prevue||d.toISOString().slice(0,10)}"></div></div>
+    <button class="btn indigo" id="f_go">${ic('check',18)} Enregistrer</button>
+    <button class="btn" id="f_no" style="margin-top:10px">Pas de frais ce mois-ci</button>`);
+  o.querySelector('#f_no').onclick=()=>{ o.remove(); sansFraisPro() };
   o.querySelector('#f_go').onclick=async()=>{
     const v=parseFloat(o.querySelector('#f_v').value); if(isNaN(v)) return toast('Montant manquant');
     const {error}=await SB.from('frais_pro').upsert({user_id:U.id,mois:o.querySelector('#f_m').value+'-01',
@@ -1022,24 +1309,26 @@ function openFraisPro(mois){
       date_virement_prevue:o.querySelector('#f_d').value||null,
       transaction_id:null,montant_recu:null,rapproche_le:null},{onConflict:'user_id,mois'});
     if(error) return toast(error.message);
-    o.remove(); toast('Frais pro enregistrés ✓'); load();
+    o.remove(); toast('Frais pro enregistrés'); load();
   };
 }
 
 function openVirN26(id){
   const p=(D.pro||[]).find(x=>x.id===id); if(!p) return;
   const recu=Number(p.montant_recu||p.montant||0);
-  const o=sheet(`<h3>Virement vers N26</h3>
-    <div class="note" style="padding:0 0 12px">Remboursement reçu : <b>${eur(recu)}</b>. Tu vires ce que tes liquidités permettent — le reste n'est pas perdu, il reste sur le compte perso.</div>
-    <label>Montant viré sur N26</label><input type="number" id="n_v" step="0.01" inputmode="decimal" value="${recu||''}">
-    <label>Date du virement</label><input type="date" id="n_d" value="${new Date().toISOString().slice(0,10)}">
-    <button class="btn primary" id="n_go">Enregistrer</button>`);
+  const o=sheet(`<h3><span class="hbadge" style="background:var(--lime-bg);color:var(--lime)">${ic('out',18)}</span>Virement vers N26</h3>
+    <div class="infobox">${ic('info',18)}<div>Remboursement reçu : <b>${eur(recu)}</b>. Tu vires ce que tes liquidités permettent — le reste n'est pas perdu, il reste sur le compte perso.</div></div>
+    <div class="card" style="text-align:center;padding:18px 16px 14px;margin-bottom:14px">
+      <div class="over">Montant viré sur N26</div>
+      <input type="number" id="n_v" class="bigin" step="0.01" inputmode="decimal" value="${recu||''}" placeholder="0,00" style="font-size:48px;color:var(--lime)"></div>
+    <div class="field"><label>Date du virement</label><input type="date" id="n_d" value="${new Date().toISOString().slice(0,10)}"></div>
+    <button class="btn primary" id="n_go">${ic('check',18)} Enregistrer</button>`);
   o.querySelector('#n_go').onclick=async()=>{
     const v=parseFloat(o.querySelector('#n_v').value); if(isNaN(v)) return toast('Montant manquant');
     const {error}=await SB.from('frais_pro').update({montant_vire_n26:v,
       date_virement_n26:o.querySelector('#n_d').value||new Date().toISOString().slice(0,10)}).eq('id',id);
     if(error) return toast(error.message);
-    o.remove(); toast('Virement noté ✓'); load();
+    o.remove(); toast('Virement noté'); load();
   };
 }
 
@@ -1081,16 +1370,16 @@ function confirmerVirementPro(){
   const {pro,tx}=item;
   const nm=new Date(pro.mois+'T00:00:00').toLocaleDateString('fr-FR',{month:'long'});
   const o=sheet(`<h3>Virement à rapprocher</h3>
-    <div class="note" style="padding:0 0 12px">Tu avais déclaré <b>${eur(Number(pro.montant))}</b> de frais pro pour ${nm}. Ce virement correspond-il ? L'écart est de ${eur(Math.abs(Number(tx.montant)-Number(pro.montant)))}.</div>
-    <div class="row"><div class="ic">💰</div><div class="mid"><div class="t">${esc(tx.libelle)}</div>
+    <div class="infobox">${ic('info',18)}<div>Tu avais déclaré <b>${eur(Number(pro.montant))}</b> de frais pro pour ${nm}. Ce virement correspond-il ? L'écart est de ${eur(Math.abs(Number(tx.montant)-Number(pro.montant)))}.</div></div>
+    <div class="list"><div class="row"><div class="ic" style="background:var(--lime-bg);color:var(--lime)">${ic('wallet',18)}</div><div class="mid"><div class="t">${esc(tx.libelle)}</div>
       <div class="s">${new Date(tx.date_operation+'T00:00:00').toLocaleDateString('fr-FR',{day:'numeric',month:'long'})}</div></div>
-      <div class="amt pos">${eur(Number(tx.montant))}</div></div>
+      <div class="amt pos">${eur(Number(tx.montant))}</div></div></div>
     <button class="btn primary" id="v_o" style="margin-top:14px">Oui, c'est le remboursement</button>
     <button class="btn" id="v_n" style="margin-top:8px">Non, rien à voir</button>`,true);
   o.querySelector('#v_o').onclick=async()=>{
     const {error}=await SB.from('frais_pro').update({statut:'recu',transaction_id:tx.id,
       montant_recu:Number(tx.montant),rapproche_le:new Date().toISOString()}).eq('id',pro.id);
-    o.remove(); toast(error?error.message:'Rapproché ✓'); load();
+    o.remove(); toast(error?error.message:'Rapproché'); load();
   };
   o.querySelector('#v_n').onclick=async()=>{
     const {error}=await SB.from('frais_pro').update({tx_ecartees:[...(pro.tx_ecartees||[]),tx.id]}).eq('id',pro.id);
@@ -1099,44 +1388,73 @@ function confirmerVirementPro(){
 }
 
 function openAcc(){
-  const o=sheet(`<h3>Nouveau compte</h3>
-    <label>Nom</label><input id="c_n" placeholder="Compte courant">
-    <label>Banque</label><input id="c_b" placeholder="Société Générale">
-    <div class="two"><div><label>Solde actuel</label><input type="number" id="c_s" step="0.01" inputmode="decimal"></div>
-    <div><label>Type</label><select id="c_t"><option value="courant">Courant</option><option value="epargne">Épargne</option></select></div></div>
-    <label style="display:flex;gap:8px;align-items:center;text-transform:none;font-size:14px;letter-spacing:0"><input type="checkbox" id="c_x" style="width:auto;margin:0"> Hors budget perso (compte pro)</label>
-    <button class="btn primary" id="c_go">Enregistrer</button>`);
+  const o=sheet(`<h3><span class="hbadge" style="background:var(--blue-bg);color:var(--blue)">${ic('card',18)}</span>Nouveau compte</h3>
+    <div class="prevcard" id="c_pv">
+      <div class="pb"><span id="pv_bq">Banque</span>${ic('card',20)}</div>
+      <div class="pn" id="pv_nom">Compte courant</div>
+      <div class="pv" id="pv_sol">0 €</div>
+    </div>
+    <div class="two">
+      <div class="field"><label>Nom</label><input id="c_n" placeholder="Compte courant"></div>
+      <div class="field"><label>Banque</label><input id="c_b" placeholder="Société Générale"></div></div>
+    <div class="field"><label>Solde actuel</label><input type="number" id="c_s" step="0.01" inputmode="decimal" placeholder="0,00"></div>
+    <label>Type</label>
+    <select id="c_t" class="hidden"><option value="courant">Courant</option><option value="epargne">Épargne</option></select>
+    <div class="seg" id="c_sg"><button type="button" class="on" data-k="courant">Courant</button><button type="button" data-k="epargne">Épargne</button></div>
+    <label class="tog" for="c_x"><div><div class="tl">Hors budget perso</div><div class="ts">Compte pro : exclu du reste à vivre</div></div>
+      <input type="checkbox" id="c_x"><span class="track"></span></label>
+    <button class="btn primary" id="c_go">${ic('check',18)} Enregistrer</button>`);
+
+  const tsel=o.querySelector('#c_t'), pv=o.querySelector('#c_pv');
+  const maj=()=>{
+    const ep=tsel.value==='epargne';
+    pv.style.setProperty('--pc',ep?'var(--teal)':'var(--blue)');
+    pv.style.setProperty('--pbg',ep?'var(--teal-bg)':'var(--blue-bg)');
+    o.querySelector('#pv_nom').textContent=o.querySelector('#c_n').value||'Compte courant';
+    o.querySelector('#pv_bq').textContent=o.querySelector('#c_b').value||(ep?'Épargne':'Banque');
+    o.querySelector('#pv_sol').textContent=eur(parseFloat(o.querySelector('#c_s').value)||0);
+  };
+  o.querySelectorAll('#c_sg button').forEach(b=>b.onclick=()=>{
+    tsel.value=b.dataset.k;
+    o.querySelectorAll('#c_sg button').forEach(x=>x.classList.toggle('on',x===b));
+    maj();
+  });
+  ['#c_n','#c_b','#c_s'].forEach(k=>o.querySelector(k).oninput=maj);
+  maj();
+
   o.querySelector('#c_go').onclick=async()=>{
     const {error}=await SB.from('accounts').insert({user_id:U.id,nom:o.querySelector('#c_n').value||'Compte',
       banque:o.querySelector('#c_b').value,solde:parseFloat(o.querySelector('#c_s').value)||0,
-      type:o.querySelector('#c_t').value,exclu_budget:o.querySelector('#c_x').checked});
+      type:tsel.value,exclu_budget:o.querySelector('#c_x').checked});
     if(error) return toast(error.message);
-    o.remove(); toast('Compte ajouté ✓'); load();
+    o.remove(); toast('Compte ajouté'); load();
   };
 }
 function openPonto(){
-  const o=sheet(`<h3>Identifiants Ponto</h3>
-    <div class="note" style="padding:0 0 12px">Ceux de <b>ton</b> intégration Ponto, à toi seul. Ils sont enregistrés côté serveur et ne sont jamais relus par le navigateur — si tu les perds, régénère le secret dans Ponto.</div>
-    <label>Client ID</label><input id="pk_i" autocomplete="off" spellcheck="false">
-    <label>Client Secret</label><input id="pk_s" type="password" autocomplete="new-password" spellcheck="false">
-    <button class="btn primary" id="pk_go">Enregistrer</button>`);
+  const o=sheet(`<h3><span class="hbadge" style="background:var(--blue-bg);color:var(--blue)">${ic('bank',18)}</span>Identifiants Ponto</h3>
+    <div class="infobox">${ic('lock',18)}<div>Ceux de <b>ton</b> intégration Ponto, à toi seul. Ils sont enregistrés côté serveur et ne sont jamais relus par le navigateur — si tu les perds, régénère le secret dans Ponto.</div></div>
+    <div class="field"><label>Client ID</label><input id="pk_i" autocomplete="off" spellcheck="false"></div>
+    <div class="field"><label>Client Secret</label><input id="pk_s" type="password" autocomplete="new-password" spellcheck="false"></div>
+    <button class="btn primary" id="pk_go">${ic('check',18)} Enregistrer</button>`);
   o.querySelector('#pk_go').onclick=async()=>{
     const ci=o.querySelector('#pk_i').value.trim(), cs=o.querySelector('#pk_s').value.trim();
     if(!ci||!cs) return toast('Les deux champs sont nécessaires');
     const {error}=await SB.rpc('enregistrer_ponto',{p_client_id:ci,p_client_secret:cs});
     if(error) return toast(error.message);
-    o.remove(); toast('Identifiants enregistrés ✓'); load();
+    o.remove(); toast('Identifiants enregistrés'); load();
   };
 }
 
 function openImpots(){
   const an=new Date().getFullYear();
-  const o=sheet(`<h3>Régularisation d'impôt</h3>
-    <div class="note" style="padding:0 0 12px">Le solde est prélevé de septembre à décembre. Donne le montant <b>mensuel</b> indiqué sur ton avis, ou le total : je répartis.</div>
-    <label>Montant mensuel</label><input type="number" id="im_m" step="0.01" inputmode="decimal" placeholder="223.00">
-    <label>Jour de prélèvement</label><input type="number" id="im_j" min="1" max="28" value="24">
-    <label>Compte prélevé</label><select id="im_a">${D.acc.map(a=>`<option value="${a.id}">${esc(a.nom)}</option>`).join('')}</select>
-    <button class="btn primary" id="im_go">Enregistrer</button>
+  const o=sheet(`<h3><span class="hbadge" style="background:var(--amber-bg);color:var(--amber)">${ic('receipt',18)}</span>Régularisation d'impôt</h3>
+    <div class="infobox">${ic('info',18)}<div>Le solde est prélevé de septembre à décembre. Donne le montant <b>mensuel</b> indiqué sur ton avis, ou le total : je répartis.</div></div>
+    <div class="card" style="text-align:center;padding:18px 16px 14px;margin-bottom:14px">
+      <div class="over">Montant mensuel</div>
+      <input type="number" id="im_m" class="bigin" step="0.01" inputmode="decimal" placeholder="0,00" style="font-size:48px;color:var(--amber)"></div>
+    <div class="two"><div class="field"><label>Jour de prélèvement</label><input type="number" id="im_j" min="1" max="28" value="24"></div>
+    <div class="field"><label>Compte prélevé</label><select id="im_a">${D.acc.map(a=>`<option value="${a.id}">${esc(a.nom)}</option>`).join('')}</select></div></div>
+    <button class="btn primary" id="im_go">${ic('check',18)} Enregistrer</button>
     <button class="btn" id="im_no" style="margin-top:8px">Rien à payer cette année</button>`);
   o.querySelector('#im_go').onclick=async()=>{
     const m=parseFloat(o.querySelector('#im_m').value); if(isNaN(m)) return toast('Montant manquant');
@@ -1147,7 +1465,7 @@ function openImpots(){
       jour_prelevement:parseInt(o.querySelector('#im_j').value)||24,
       prochaine_echeance:`${an}-09-01`, date_fin:`${an}-12-31`});
     if(error) return toast(error.message);
-    o.remove(); toast('Échéances enregistrées ✓'); load();
+    o.remove(); toast('Échéances enregistrées'); load();
   };
   o.querySelector('#im_no').onclick=async()=>{
     await SB.from('settings').upsert({user_id:U.id,impots_traites_an:an},{onConflict:'user_id'});
@@ -1165,12 +1483,12 @@ async function inventairePonto(){
   const j = await r.json().catch(()=>({error:'Réponse illisible'}));
   const txt = JSON.stringify(j,null,2);
   const o = sheet(`<h3>Comptes Ponto</h3>
-    <div class="note" style="padding:0 0 10px">Rien n'a été écrit en base. Copie ce texte et envoie-le dans la conversation.</div>
-    <textarea id="inv" readonly style="width:100%;height:46vh;padding:12px;border-radius:12px;border:1px solid var(--line);background:var(--panel2);color:var(--txt);font:500 12px 'JetBrains Mono',monospace">${esc(txt)}</textarea>
+    <div class="infobox">${ic('info',18)}<div>Rien n'a été écrit en base. Copie ce texte et envoie-le dans la conversation.</div></div>
+    <textarea id="inv" readonly style="height:46vh;padding:12px;border-radius:15px;border:1px solid #2A3038;background:var(--field);color:var(--txt);font:500 12px 'Geist Mono',monospace">${esc(txt)}</textarea>
     <button class="btn primary" id="cp">Copier</button>`);
   o.querySelector('#cp').onclick=()=>{
     const t=o.querySelector('#inv'); t.select();
-    navigator.clipboard?.writeText(t.value).then(()=>toast('Copié ✓'),()=>document.execCommand('copy'));
+    navigator.clipboard?.writeText(t.value).then(()=>toast('Copié'),()=>document.execCommand('copy'));
   };
 }
 
@@ -1201,15 +1519,15 @@ async function togglePartage(id,partage){
   toast(partage?'Compte repassé en privé':'Compte partagé avec le foyer'); load();
 }
 function openInvit(){
-  const o=sheet(`<h3>Inviter au foyer</h3>
-    <div class="note" style="padding:0 0 12px">La personne rejoindra le foyer à sa première connexion avec cette adresse. Elle verra uniquement les comptes rattachés au foyer.</div>
-    <label>Adresse e-mail</label><input type="email" id="v_e" placeholder="prenom@gmail.com">
-    <button class="btn primary" id="v_go">Envoyer l'invitation</button>`);
+  const o=sheet(`<h3><span class="hbadge" style="background:#241C33;color:var(--violet)">${ic('users',18)}</span>Inviter au foyer</h3>
+    <div class="infobox">${ic('info',18)}<div>La personne rejoindra le foyer à sa première connexion avec cette adresse. Elle verra uniquement les comptes rattachés au foyer.</div></div>
+    <div class="field"><label>Adresse e-mail</label><input type="email" id="v_e" placeholder="prenom@gmail.com"></div>
+    <button class="btn primary" id="v_go">${ic('mail',18)} Envoyer l'invitation</button>`);
   o.querySelector('#v_go').onclick=async()=>{
     const e=o.querySelector('#v_e').value.trim(); if(!e) return toast('E-mail manquant');
     const {error}=await SB.from('foyer_invitations').insert({foyer_id:D.foyer.id,email:e});
     if(error) return toast(error.message);
-    o.remove(); toast('Invitation créée ✓'); load();
+    o.remove(); toast('Invitation créée'); load();
   };
 }
 async function creerFoyer(){
@@ -1217,12 +1535,12 @@ async function creerFoyer(){
   const {data,error}=await SB.from('foyers').insert({nom,created_by:U.id}).select().single();
   if(error) return toast(error.message);
   await SB.from('foyer_membres').insert({foyer_id:data.id,user_id:U.id,role:'proprietaire'});
-  toast('Foyer créé ✓'); load();
+  toast('Foyer créé'); load();
 }
 async function majSolde(id,cur){
   const v=prompt('Solde actuel du compte :',cur); if(v===null) return;
   const n=parseFloat(String(v).replace(',','.')); if(isNaN(n)) return toast('Montant invalide');
-  await SB.from('accounts').update({solde:n}).eq('id',id); toast('Solde mis à jour ✓'); load();
+  await SB.from('accounts').update({solde:n}).eq('id',id); toast('Solde mis à jour'); load();
 }
 async function saveSet(){
   const {error}=await SB.from('settings').upsert({user_id:U.id,
@@ -1233,7 +1551,7 @@ async function saveSet(){
     jour_rappel_frais_pro:parseInt(document.getElementById('s_fp').value)||15,
     frais_pro_delai_jours:parseInt(document.getElementById('s_fd').value)||0,
     frais_pro_tolerance:parseFloat(document.getElementById('s_ft').value)||0},{onConflict:'user_id'});
-  toast(error?error.message:'Enregistré ✓'); load();
+  toast(error?error.message:'Enregistré'); load();
 }
 
 /* ---------- BOOT ---------- */

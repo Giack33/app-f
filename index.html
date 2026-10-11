@@ -385,7 +385,7 @@ function moteur(){
   const borne=prochaine?prochaine.date:finMois;
   const joursAvantEntree=Math.max(1,Math.round((borne-aujourdhui)/864e5));
   const sortiesAvantEntree=aVenir.filter(x=>x.date<=borne).reduce((s,x)=>s+x.montant,0);
-  const reste=solde-sortiesAvantEntree-epRestante;
+  const reste=solde-sortiesAvantEntree;
   const hebdo=reste/(joursAvantEntree/7);
   const parJour=reste/joursAvantEntree;
 

@@ -69,6 +69,8 @@ h2 .count{background:var(--panel2);color:var(--txt);border-radius:999px;padding:
 .row .t{font-weight:600;font-size:14.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .row .s{font-size:12px;color:var(--muted);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .row .amt{font-weight:700;font-size:15px;white-space:nowrap;flex-shrink:0}
+.row .mini{flex-shrink:0;width:28px;height:28px;border-radius:9px;border:1px solid var(--line);background:var(--panel2);color:var(--muted);font-size:14px;line-height:1;cursor:pointer;padding:0}
+.row .mini:hover{color:#fff;border-color:var(--muted)}
 .neg{color:var(--red)}.pos{color:var(--green)}
 .empty{color:var(--dim);font-size:13.5px;padding:18px;text-align:center;border:1px dashed var(--line);border-radius:14px;line-height:1.5}
 .note{font-size:12.5px;color:var(--dim);line-height:1.5;padding:4px 2px 0}
@@ -453,6 +455,56 @@ function depenseNeutre(t){
   return c.type==='fixe' || c.type==='epargne' || /transfert|frais pro/i.test(c.nom||'');
 }
 
+/* ---------- ABONNEMENTS NON DECLARES ---------- */
+// Un meme commercant preleve a peu pres le meme montant, environ une fois par mois,
+// sur au moins 3 mois, et encore recemment : c'est un abonnement qui s'ignore.
+function sansAccent(s){return (s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toUpperCase()}
+function cleDebit(t){
+  return sansAccent(t.contrepartie||t.libelle||'')
+    .replace(/CARTE\s+X?\d*/g,' ')
+    .replace(/REF\s*:.*$/,' ').replace(/MOTIF.*$/,' ')
+    .replace(/[0-9]+/g,' ')
+    .replace(/\b(PRELEVEMENT|EUROPEEN|LOGITEL|WERO|PERM|EUR|USD|CHF|IRL|LUX|PAYS|BAS|COMMERCE|ELECTRONIQUE|ELECTR|PAIEMENT|PENDING|SARL|SAS|SASU|FRANCE|FRA|COM|WWW|INST|INSTANTANE|VIR|VIREMENT|EMIS|RECU)\b/g,' ')
+    .replace(/[^A-Z ]/g,' ').replace(/\s+/g,' ').trim()
+    .split(' ').filter((w,i,a)=>w.length>2 && !/^(.)\1+$/.test(w) && a.indexOf(w)===i).slice(0,3).join(' ');
+}
+function abosIgnores(){ try{return JSON.parse(localStorage.getItem('abosIgnores')||'[]')}catch(e){return []} }
+function ignorerAbo(k){ const l=abosIgnores(); if(!l.includes(k)) l.push(k); localStorage.setItem('abosIgnores',JSON.stringify(l)); render(); }
+function abosDetectes(){
+  const now=new Date(), limite=new Date(now.getFullYear(),now.getMonth()-5,1);
+  const dejaNoms=D.rec.map(r=>sansAccent(r.nom).split(/[^A-Z]+/).filter(w=>w.length>2));
+  const dejaMontants=D.rec.map(r=>Math.abs(Number(r.montant)));
+  const ignores=abosIgnores();
+  const grp={};
+  D.tx.forEach(t=>{
+    const v=-Number(t.montant);
+    if(v<=1 || v>250 || t.interne || t.statut==='ignoree' || t.recurring_charge_id) return;
+    const d=new Date(t.date_operation+'T00:00:00'); if(d<limite) return;
+    const k=cleDebit(t); if(!k || k.length<4) return;
+    (grp[k]=grp[k]||[]).push({v,d});
+  });
+  const out=[];
+  Object.entries(grp).forEach(([k,lot])=>{
+    const mois=new Set(lot.map(x=>x.d.getFullYear()+'-'+x.d.getMonth()));
+    if(mois.size<3) return;                              // pas assez regulier
+    if(lot.length>mois.size*1.4) return;                 // plusieurs fois par mois : du courant, pas un abonnement
+    const dernier=lot.reduce((a,b)=>b.d>a.d?b:a).d;
+    if((now-dernier)>45*864e5) return;                   // arrete : rien a signaler
+    const moy=lot.reduce((s,x)=>s+x.v,0)/lot.length;
+    const ecart=Math.sqrt(lot.reduce((s,x)=>s+(x.v-moy)**2,0)/lot.length);
+    if(ecart>Math.max(1,moy*0.12)) return;               // montant trop instable
+    if(ignores.includes(k)) return;
+    const mots=k.split(' ');
+    if(dejaNoms.some(n=>n.some(w=>mots.includes(w)))) return;   // deja declaree, par le nom
+    if(dejaMontants.some(x=>Math.abs(x-moy)<0.05)) return;      // deja declaree, par le montant
+    const jours=lot.map(x=>x.d.getDate()).sort((a,b)=>a-b);
+    out.push({cle:k, nom:k.split(' ').map(w=>w[0]+w.slice(1).toLowerCase()).join(' '),
+              montant:Math.round(moy*100)/100, jour:jours[Math.floor(jours.length/2)],
+              mois:mois.size, dernier});
+  });
+  return out.sort((a,b)=>b.montant-a.montant);
+}
+
 /* ---------- VUES ---------- */
 function render(){
   document.querySelectorAll('nav button').forEach(b=>b.classList.toggle('on',b.dataset.t===TAB));
@@ -529,6 +581,19 @@ function vHome(){
       <div class="s">${a.fin_essai_gratuit?`⚠ essai gratuit jusqu'au ${new Date(a.fin_essai_gratuit+'T00:00:00').toLocaleDateString('fr-FR')}`:`le ${a.jour_prelevement||'?'} ${PERIODE[a.frequence]||''}`}</div></div>
       <div class="amt neg">${eur(-a.montant)}</div></div>`).join('');
     h+=`<div class="note">Soit ${eur0(tot*12)} sur l'année.</div>`;
+  }
+
+  const det=abosDetectes();
+  if(det.length){
+    const totd=det.reduce((s,a)=>s+a.montant,0);
+    h+=`<h2>Détectés, pas encore déclarés <span class="count">${eur0(totd)} / mois</span></h2>`;
+    h+=det.map(a=>`<div class="row"><div class="ic" style="background:#f59e0b22;color:#f59e0b">?</div>
+      <div class="mid"><div class="t">${esc(a.nom)}</div>
+      <div class="s">environ le ${a.jour} · ${a.mois} mois d'affilée</div></div>
+      <div class="amt neg">${eur(-a.montant)}</div>
+      <button class="mini" onclick='adopterAbo(${JSON.stringify(JSON.stringify(a))})'>+</button>
+      <button class="mini" onclick='ignorerAbo(${JSON.stringify(a.cle)})'>✕</button></div>`).join('');
+    h+=`<div class="note">« + » pour en faire une charge suivie, « ✕ » pour ne plus la voir.</div>`;
   }
   return h;
 }
@@ -820,18 +885,21 @@ function openAdd(){
   };
 }
 
-function openRec(){
+function adopterAbo(j){ const a=JSON.parse(j); openRec({nom:a.nom,montant:a.montant,jour:a.jour,abo:true}); }
+function openRec(pre){
+  pre=pre||{};
   const o=sheet(`<h3>Charge récurrente</h3>
-    <label>Nom</label><input id="r_n" placeholder="Loyer, Netflix, assurance…">
-    <div class="two"><div><label>Montant</label><input type="number" id="r_m" step="0.01" inputmode="decimal"></div>
-    <div><label>Jour (si mensuel)</label><input type="number" id="r_j" min="1" max="31" value="5"></div></div>
+    <label>Nom</label><input id="r_n" placeholder="Loyer, Netflix, assurance…" value="${esc(pre.nom||'')}">
+    <div class="two"><div><label>Montant</label><input type="number" id="r_m" step="0.01" inputmode="decimal" value="${pre.montant||''}"></div>
+    <div><label>Jour (si mensuel)</label><input type="number" id="r_j" min="1" max="31" value="${pre.jour||5}"></div></div>
     <label>Fréquence</label><select id="r_f">
       <option value="mensuel">Mensuel</option><option value="bimestriel">Tous les 2 mois</option>
       <option value="trimestriel">Trimestriel</option><option value="semestriel">Semestriel</option><option value="annuel">Annuel</option></select>
     <label>Prochaine échéance (si pas mensuel)</label><input type="date" id="r_e">
     <label>Catégorie</label><select id="r_c">${D.cats.filter(c=>c.type!=='revenu').map(c=>`<option value="${c.id}">${esc(c.nom)}</option>`).join('')}</select>
-    <label style="display:flex;gap:8px;align-items:center;text-transform:none;font-size:14px;letter-spacing:0"><input type="checkbox" id="r_a" style="width:auto;margin:0"> C'est un abonnement</label>
+    <label style="display:flex;gap:8px;align-items:center;text-transform:none;font-size:14px;letter-spacing:0"><input type="checkbox" id="r_a" style="width:auto;margin:0"${pre.abo?' checked':''}> C'est un abonnement</label>
     <button class="btn primary" id="r_go">Enregistrer</button>`);
+  if(pre.cat) o.querySelector('#r_c').value=pre.cat;
   o.querySelector('#r_go').onclick=async()=>{
     const m=parseFloat(o.querySelector('#r_m').value); if(isNaN(m)) return toast('Montant manquant');
     const f=o.querySelector('#r_f').value, e=o.querySelector('#r_e').value||null;

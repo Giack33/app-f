@@ -168,7 +168,7 @@ async function logout(){ await SB.auth.signOut(); location.reload() }
 
 /* ---------- CHARGEMENT ---------- */
 async function load(){
-  const [s,c,a,t,r,i,d,fy,fm,fi,pr,pc,fp] = await Promise.all([
+  const [s,c,a,t,r,i,d,fy,fm,fi,pr,pc,fp,ed] = await Promise.all([
     SB.from('settings').select('*').maybeSingle(),
     SB.from('categories').select('*').order('type').order('nom'),
     SB.from('accounts').select('*').eq('actif',true),
@@ -181,11 +181,12 @@ async function load(){
     SB.from('foyer_invitations').select('*'),
     SB.from('profiles').select('id,email,full_name'),
     SB.rpc('ponto_configure'),
-    SB.from('frais_pro').select('*').order('mois',{ascending:false}).limit(24)
+    SB.from('frais_pro').select('*').order('mois',{ascending:false}).limit(24),
+    SB.from('edf_conso').select('*').order('mois')
   ]);
   D = {set:s.data||{}, cats:c.data||[], acc:a.data||[], tx:t.data||[], rec:r.data||[], inc:i.data||[], docs:d.data||[],
        foyer:fy.data||null, membres:fm.data||[], invits:fi.data||[], profils:pr.data||[],
-       pontoCred:pc.data||null, pro:fp.data||[]};  // horodatage de configuration, jamais les identifiants
+       pontoCred:pc.data||null, pro:fp.data||[], edf:ed.data||[]};  // horodatage de configuration, jamais les identifiants
   // Toutes les catégories servent à résoudre les libellés (dont celles du conjoint) ;
   // au choix on ne propose que les actives, dédoublonnées par nom.
   D.catById = Object.fromEntries(D.cats.map(x=>[x.id,x]));
@@ -372,10 +373,9 @@ function moteur(){
   }).reduce((s,t)=>s+Math.abs(Number(t.montant)),0);
   const epRestante=Math.max(0,objEp-dejaEp);
 
-  // Entrees attendues : salaire, apport du conjoint, remboursement de frais pro.
-  // Sans elles la courbe plongeait mecaniquement : elle ne voyait que les sorties.
-  const inflows=[...entreesPrevues(aujourdhui,fin),
-                 ...proPrevus.map(p=>({nom:'Frais pro Generali',montant:p.montant,date:p.date,pro:true}))]
+  // Entrees attendues : salaire, apport du conjoint. Les frais pro Generali sont
+  // volontairement exclus de tout calcul : ils transitent par le compte N26, isole du dashboard.
+  const inflows=[...entreesPrevues(aujourdhui,fin)]
                 .filter(e=>e.date>aujourdhui && e.date<=fin)
                 .sort((a,b)=>a.date-b.date);
   const totalEntrees=inflows.reduce((s,e)=>s+e.montant,0);
@@ -448,6 +448,88 @@ function moteur(){
           abos:D.rec.filter(r=>r.est_abonnement),
           chargesMois:D.rec.reduce((s,r)=>s+parMois(r),0)};
 }
+/* ---------- A PREVOIR POUR LE MOIS PROCHAIN ---------- */
+// Seules les depenses contraintes sont provisionnees. Resto, loisirs, shopping, Pokemon
+// dependent de ce qu'il reste ; la sante n'est pas previsible. Ils ne sont pas provisionnes.
+const CATS_VARIABLES=['Courses','Tabac','Transport & carburant','Péages'];
+const EDF_INDEX=1.03;   // indexation appliquee a la conso de l'an dernier
+
+function normCat(s){return (s||'').normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase()}
+const CATS_VAR_N=CATS_VARIABLES.map(normCat);
+
+// Conso EDF du meme mois l'an dernier, indexee.
+function edfConso(d){
+  const k=`${d.getFullYear()-1}-${String(d.getMonth()+1).padStart(2,'0')}-01`;
+  const e=(D.edf||[]).find(x=>String(x.mois).slice(0,10)===k);
+  return e?Number(e.montant)*EDF_INDEX:null;
+}
+// Un prelevement EDF couvre les deux mois de conso qui le precedent.
+function edfEstime(d){
+  const a=new Date(d.getFullYear(),d.getMonth()-2,1), b=new Date(d.getFullYear(),d.getMonth()-1,1);
+  const va=edfConso(a), vb=edfConso(b);
+  if(va===null||vb===null) return null;
+  const f=x=>x.toLocaleDateString('fr-FR',{month:'short'});
+  return {montant:Math.round((va+vb)*100)/100,
+          note:`estime sur la conso ${f(a)} + ${f(b)} de l'an dernier, +${Math.round((EDF_INDEX-1)*100)} %`};
+}
+
+// Moyenne mensuelle des depenses contraintes sur les 3 derniers mois complets.
+function variablesMoyennes(){
+  const now=new Date(), mois=[1,2,3].map(k=>new Date(now.getFullYear(),now.getMonth()-k,1));
+  const cles=new Set(mois.map(d=>d.getFullYear()+'-'+d.getMonth()));
+  const detail={};
+  D.tx.forEach(t=>{
+    if(Number(t.montant)>=0||t.statut==='ignoree'||t.interne) return;
+    const nom=D.catById[t.category_id]?.nom;
+    if(!nom || CATS_VAR_N.indexOf(normCat(nom))<0) return;
+    const d=new Date(t.date_operation+'T00:00:00');
+    if(!cles.has(d.getFullYear()+'-'+d.getMonth())) return;
+    detail[nom]=(detail[nom]||0)+Math.abs(Number(t.montant));
+  });
+  const n=mois.length;
+  return {parCat:Object.entries(detail).map(([nom,v])=>({nom,montant:Math.round(v/n*100)/100})).sort((a,b)=>b.montant-a.montant),
+          mois:mois.map(d=>d.toLocaleDateString('fr-FR',{month:'short'})).reverse()};
+}
+
+// Tout ce qu'il faudra sortir le mois prochain, du 1er au dernier jour.
+function aPrevoir(){
+  const now=new Date();
+  const debut=new Date(now.getFullYear(),now.getMonth()+1,1);
+  const fin=new Date(now.getFullYear(),now.getMonth()+2,0);
+  const lignes=[];
+
+  D.rec.forEach(r=>{
+    const estEDF=/\bedf\b/i.test(r.nom);
+    echeances(r,debut,fin).forEach(d=>{
+      let montant=Number(r.montant), note=null;
+      if(estEDF){
+        const e=edfEstime(d);
+        if(e){ montant=e.montant; note=e.note }
+        else note='montant du dernier prelevement : historique de conso incomplet';
+      }
+      lignes.push({nom:r.nom,montant,date:d,type:'fixe',note,abo:r.est_abonnement});
+    });
+  });
+
+  const ep=Number(D.set.objectif_epargne_mensuel||0);
+  if(ep>0) lignes.push({nom:"Objectif d'epargne",montant:ep,date:debut,type:'epargne'});
+
+  const dimF=fin.getDate();
+  abosDetectes().forEach(a=>lignes.push({nom:a.nom,montant:a.montant,type:'abo_detecte',
+    date:new Date(debut.getFullYear(),debut.getMonth(),Math.min(a.jour,dimF)),
+    note:`detecte, pas encore declare · ${a.mois} mois d'affilee`}));
+
+  const v=variablesMoyennes();
+  v.parCat.forEach(c=>lignes.push({nom:c.nom,montant:c.montant,type:'variable',
+    note:`moyenne ${v.mois.join(' / ')}`}));
+
+  lignes.sort((a,b)=>(a.date&&b.date)?a.date-b.date:(a.date?-1:(b.date?1:b.montant-a.montant)));
+  const par=t=>lignes.filter(x=>x.type===t).reduce((s,x)=>s+x.montant,0);
+  return {debut,fin,lignes,total:lignes.reduce((s,x)=>s+x.montant,0),
+          fixes:par('fixe'),epargne:par('epargne'),abosDet:par('abo_detecte'),variables:par('variable'),
+          nomMois:debut.toLocaleDateString('fr-FR',{month:'long'})};
+}
+
 function parJourMoyen(){
   const d30=D.tx.filter(t=>Number(t.montant)<0 && t.statut!=='ignoree' && !t.interne
     && (Date.now()-new Date(t.date_operation+'T00:00:00'))<30*864e5
@@ -523,7 +605,7 @@ function render(){
 function go(t){TAB=t;render();window.scrollTo(0,0)}
 
 function vHome(){
-  const m=moteur();
+  const m=moteur(), ap=aPrevoir();
   const dernier=m.finMois.getDate();
   let h=`<div class="hero" style="--heroc:${m.couleur}">
     <div class="lbl">Reste à vivre</div>
@@ -536,7 +618,7 @@ function vHome(){
     <div class="card"><div class="k">Solde commun</div><div class="v num">${eur0(m.soldeCommun)}</div><div class="n">${m.comptesCommuns.length?m.comptesCommuns.map(a=>esc(a.nom)).join(' · '):'aucun compte partagé'}</div></div>
     <div class="card"><div class="k">Solde perso</div><div class="v num">${eur0(m.soldePerso)}</div><div class="n">${m.comptesPersos.length?m.comptesPersos.map(a=>esc(a.nom)).join(' · '):'aucun compte perso'}</div></div>
     <div class="card"><div class="k">À sortir d'ici le ${dernier}</div><div class="v num neg">${eur0(m.totalAVenirMois)}</div><div class="n">${m.aVenirMois.length} échéance${m.aVenirMois.length>1?'s':''}</div></div>
-    <div class="card"><div class="k">À rentrer d'ici le ${dernier}</div><div class="v num pos">${eur0(m.inflows.filter(e=>e.date<=m.finMois).reduce((s,e)=>s+e.montant,0))}</div><div class="n">${m.prochaine?`prochaine le ${m.prochaine.date.toLocaleDateString('fr-FR',{day:'numeric',month:'short'})}`:'rien d\'identifié'}</div></div>
+    <div class="card clic" onclick="openPrevoir()"><div class="k">À prévoir pour ${ap.nomMois}</div><div class="v num neg">${eur0(ap.total)}</div><div class="n">charges, épargne et dépenses contraintes ›</div></div>
     <div class="card"><div class="k">Solde projeté au ${dernier}</div><div class="v num" style="color:${m.finMoisBal<0?'var(--red)':'var(--txt)'}">${eur0(m.finMoisBal)}</div><div class="n">entrées, charges et train de vie compris</div></div>
     <div class="card"><div class="k">Charges fixes</div><div class="v num">${eur0(m.chargesMois)}</div><div class="n">moyenne lissée / mois</div></div>
   </div>`;
@@ -869,6 +951,26 @@ function openDepMois(cat){
       <div class="s">${cat?(a?esc(a.nom):'—'):(c?esc(c.nom):'à classer')}</div></div>
       <div class="amt neg">${eur(Number(t.montant))}</div></div>`;
   });
+  sheet(h);
+}
+
+function openPrevoir(){
+  const ap=aPrevoir();
+  const ICO={fixe:'🏠',epargne:'🐷',abo_detecte:'?',variable:'🛒'};
+  const TTL={fixe:'Charges fixes',epargne:'Épargne',abo_detecte:'Abonnements détectés',variable:'Dépenses contraintes estimées'};
+  const nm=ap.debut.toLocaleDateString('fr-FR',{month:'long',year:'numeric'});
+  let h=`<h3>À prévoir — ${nm} <span class="count">${eur0(ap.total)}</span></h3>
+    <div style="color:var(--dim);font-size:12.5px;margin:-10px 0 14px">du 1er au ${ap.fin.getDate()} ${ap.nomMois} · frais pro Generali exclus (compte N26)</div>`;
+  ['fixe','epargne','abo_detecte','variable'].forEach(t=>{
+    const l=ap.lignes.filter(x=>x.type===t); if(!l.length) return;
+    const tot=l.reduce((s,x)=>s+x.montant,0);
+    h+=`<h2>${TTL[t]} <span class="count">${eur0(tot)}</span></h2>`;
+    h+=l.map(x=>`<div class="row"><div class="ic">${x.abo?'🔁':ICO[t]}</div>
+      <div class="mid"><div class="t">${esc(x.nom)}</div>
+      <div class="s">${x.date&&t!=='variable'?x.date.toLocaleDateString('fr-FR',{day:'numeric',month:'short'}):''}${x.note?(x.date&&t!=='variable'?' · ':'')+esc(x.note):''}</div></div>
+      <div class="amt neg">${eur(-x.montant)}</div></div>`).join('');
+  });
+  h+=`<div class="note">Resto, loisirs, shopping et santé ne sont pas provisionnés : ils dépendent de ce qu'il reste.</div>`;
   sheet(h);
 }
 

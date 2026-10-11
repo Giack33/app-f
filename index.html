@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<link rel="stylesheet" href="styles.css?v=9">
+<link rel="stylesheet" href="styles.css?v=10">
 </head>
 <body>
 
@@ -300,7 +300,7 @@ function moteur(){
 
   // ce qui tombe encore d'ici la fin du mois, toutes fréquences confondues
   const aVenir=[];
-  D.rec.forEach(r=>echeances(r,aujourdhui,fin).forEach(d=>aVenir.push({nom:r.nom,montant:Number(r.montant),date:d,abo:r.est_abonnement,freq:r.frequence})));
+  D.rec.forEach(r=>echeances(r,aujourdhui,fin).forEach(d=>aVenir.push({nom:r.nom,montant:Number(r.montant),date:d,abo:r.est_abonnement,freq:r.frequence,acc:r.account_id})));
   D.docs.forEach(x=>{
     if(!x.montant) return;
     const d=x.date_echeance?new Date(x.date_echeance+'T00:00:00'):null;
@@ -622,9 +622,10 @@ function vHome(){
   h+=`<h2>Ce qui tombe bientôt <span class="count">${eur0(m.totalAVenirMois)}</span></h2>`;
   if(m.aVenirMois.length){
     h+=`<div class="list">`+m.aVenirMois.slice(0,3).map(p=>`<div class="row">
+      <i class="accstripe" style="background:${accCol(p.acc)}" title="${esc(accNom(p.acc))}"></i>
       <div class="datepill"><i>${p.date.getDate()}</i><u>${p.date.toLocaleDateString('fr-FR',{month:'short'}).replace('.','')}</u></div>
       <div class="mid"><div class="t">${esc(p.nom)}</div>
-      <div class="s">${p.date.toLocaleDateString('fr-FR',{weekday:'long'})}${p.facture?' · facture':p.abo?' · abonnement':''}</div></div>
+      <div class="s">${p.date.toLocaleDateString('fr-FR',{weekday:'long'})}${p.facture?' · facture':p.abo?' · abonnement':''}${accNom(p.acc)?` · <span style="color:${accCol(p.acc)}">${esc(accNom(p.acc))}</span>`:''}</div></div>
       <div class="amt neg">${eur(-p.montant)}</div></div>`).join('');
     if(m.aVenirMois.length>3) h+=`<div class="row clic" onclick="openASortir()" style="color:var(--lime)">
       <div class="mid"><div class="t" style="color:var(--lime)">Voir les ${m.aVenirMois.length} échéances</div></div><div>›</div></div>`;
@@ -1161,15 +1162,18 @@ function openASortir(){
   const fm=new Date(new Date().getFullYear(),new Date().getMonth()+1,0);
   const nm=fm.toLocaleDateString('fr-FR',{month:'long',year:'numeric'});
   let h=`<h3>À sortir d'ici la fin du mois <span class="count">${eur0(m.totalAVenirMois)}</span></h3>
-    <div class="over" style="margin:-8px 0 14px;color:var(--faint)">${l.length} échéance${l.length>1?'s':''} · jusqu'au ${fm.getDate()} ${nm}</div>`;
+    <div class="over" style="margin:-8px 0 10px;color:var(--faint)">${l.length} échéance${l.length>1?'s':''} · jusqu'au ${fm.getDate()} ${nm}</div>
+    <div class="acclg" style="margin-bottom:12px"><span><i style="background:${COL_COMMUN}"></i>compte commun</span>
+      <span><i style="background:${COL_PERSO}"></i>compte perso</span></div>`;
   if(!l.length){ sheet(h+`<div class="empty">Plus rien à sortir d'ici la fin du mois.</div>`); return }
   let jour='';
   l.forEach(p=>{
     const j=p.date.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'});
     if(j!==jour){ h+=`${jour?'</div>':''}<div class="dayhead"><div class="over">${j}</div></div><div class="list">`; jour=j }
-    h+=`<div class="row"><div class="datepill"><i>${p.date.getDate()}</i><u>${p.date.toLocaleDateString('fr-FR',{month:'short'}).replace('.','')}</u></div>
+    h+=`<div class="row"><i class="accstripe" style="background:${accCol(p.acc)}" title="${esc(accNom(p.acc))}"></i>
+      <div class="datepill"><i>${p.date.getDate()}</i><u>${p.date.toLocaleDateString('fr-FR',{month:'short'}).replace('.','')}</u></div>
       <div class="mid"><div class="t">${esc(p.nom)}</div>
-      <div class="s">${p.facture?'facture':(p.abo?'abonnement':'charge fixe')}${p.freq?' · '+esc(p.freq):''}</div></div>
+      <div class="s">${p.facture?'facture':(p.abo?'abonnement':'charge fixe')}${p.freq?' · '+esc(p.freq):''}${accNom(p.acc)?` · <span style="color:${accCol(p.acc)}">${esc(accNom(p.acc))}</span>`:''}</div></div>
       <div class="amt neg">${eur(-p.montant)}</div></div>`;
   });
   h+=`</div><div class="note">Solde courant actuel ${eur0(m.solde)} → ${eur0(m.solde-m.totalAVenirMois)} une fois tout passé.</div>`;

@@ -411,7 +411,7 @@ function moteur(){
   // Aucun salaire futur n'est injecté : il est variable, donc inconnu tant qu'il n'est pas saisi.
   const sorties={}, detail={};
   aVenir.forEach(x=>{
-    if(x.date<=aujourdhui) return;
+    if(x.date<aujourdhui) return;
     const k=x.date.toDateString();
     sorties[k]=(sorties[k]||0)+x.montant;
     (detail[k]=detail[k]||[]).push(x.nom);
@@ -427,6 +427,8 @@ function moteur(){
       bal-=sorties[key]||0;
       bal+=entrees[key]||0;
       bal-=quotidien;
+    }else{
+      bal-=sorties[key]||0;   // charge tombant aujourd'hui : deduite aussi du reste a vivre, pas de train de vie au jour 0
     }
     proj.push({d,bal,out:sorties[key]||0,inn:entrees[key]||0,noms:detail[key]||[],nomsIn:detailIn[key]||[]});
   }

@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<link rel="stylesheet" href="styles.css?v=6">
+<link rel="stylesheet" href="styles.css?v=7">
 </head>
 <body>
 
@@ -64,6 +64,12 @@ const jsq = s => String(s==null?'':s).replace(/\\/g,'\\\\').replace(/'/g,"\\'");
 const PERIODE={hebdomadaire:'par semaine',mensuel:'par mois',bimestriel:'tous les 2 mois',trimestriel:'par trimestre',semestriel:'par semestre',annuel:'par an'};
 const PAR_AN={hebdomadaire:52,mensuel:12,bimestriel:6,trimestriel:4,semestriel:2,annuel:1};
 const parMois = r => Number(r.montant)*(PAR_AN[r.frequence]||12)/12;
+
+// --- Couleur d'origine : chaque compte a sa teinte, pour reperer d'ou vient l'operation ---
+const ACC_PAL=['#7DB8FF','#C9A2FF','#5ED6C1','#A9B4FF','#D4F25C'];
+const accIdx = id => [...D.acc].map(a=>a.id).sort().indexOf(id);   // ordre stable : la couleur ne bouge pas d'une session a l'autre
+const accCol = id => { const i=accIdx(id); return i<0?'#6F7882':ACC_PAL[i%ACC_PAL.length] };
+const accNom = id => { const a=D.acc.find(x=>x.id===id); return a?a.nom:'' };
 
 const ICP={
   home:'<path d="M3.5 17a9 9 0 1 1 17 0"/><path d="M12 13.5 16 9"/>',
@@ -800,6 +806,8 @@ function vFlux(){
   </div>
   <div class="seg" id="fseg">${SEG.map(([k,l])=>
     `<button data-f="${k}" class="${FLUX.f===k?'on':''}" onclick="FLUX.f='${k}';renderFlux()">${l}</button>`).join('')}</div>
+  ${D.acc.length>1?`<div class="acclg">`+[...D.acc].sort((x,y)=>x.id.localeCompare(y.id))
+      .map(a=>`<span><i style="background:${accCol(a.id)}"></i>${esc(a.nom)}</span>`).join('')+`</div>`:''}
   <div id="fluxlist"></div>`;
   return h;
 }
@@ -835,9 +843,11 @@ function renderFlux(){
       const c=D.catById[t.category_id], acl=t.statut==='a_valider'||!c;
       const col=acl?'var(--amber)':(c?c.couleur:'var(--muted)');
       const bg=acl?'var(--amber-bg)':(c&&c.couleur?c.couleur+'22':'var(--panel2)');
-      return `<div class="row"><div class="ic" style="background:${bg};color:${col}">${acl?ic('quest',18):esc((c.nom||'?').trim().charAt(0).toUpperCase())}</div>
+      const ac=accCol(t.account_id), an=accNom(t.account_id);
+      return `<div class="row"><i class="accstripe" style="background:${ac}" title="${esc(an)}"></i>
+        <div class="ic" style="background:${bg};color:${col}">${acl?ic('quest',18):esc((c.nom||'?').trim().charAt(0).toUpperCase())}</div>
         <div class="mid"><div class="t">${esc(t.libelle)}</div>
-        <div class="s"${acl?' style="color:var(--amber)"':''}>${acl?'à classer':esc(c.nom)}</div></div>
+        <div class="s">${acl?'<b style="color:var(--amber);font-weight:600">à classer</b>':esc(c.nom)}${an?` · <span style="color:${ac}">${esc(an)}</span>`:''}</div></div>
         <div class="amt ${Number(t.montant)<0?'neg':'pos'}">${eur(Number(t.montant))}</div></div>`;
     }).join('')+`</div>`;
   }).join('');

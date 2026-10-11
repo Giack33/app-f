@@ -10,19 +10,19 @@
   --indigo:#A9B4FF; --indigo-bg:#262B4A;
   --r-xl:30px; --r-lg:22px; --r-md:16px; --r-sm:13px;
   /* compat ancien code */
-  --green:#D4F25C; --orange:#F2B84B; --red:#FF8A6B; --r:22px;
+  --green:#D4F25C; --orange:#F2B84B; --red:#FF8A6B;
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html{-webkit-text-size-adjust:100%}
 body{background:var(--bg);color:var(--txt);font-family:Geist,system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased;padding-bottom:100px;overflow-x:hidden}
-.num,.amt,.card .v,.hero .big{font-family:'Geist Mono',ui-monospace,monospace;font-variant-numeric:tabular-nums;font-weight:600;letter-spacing:-.02em}
+.amt,.card .v,.hero .big{font-family:'Geist Mono',ui-monospace,monospace;font-variant-numeric:tabular-nums;font-weight:600;letter-spacing:-.02em}
 .wrap{max-width:860px;margin:0 auto;padding:16px}
 .hidden{display:none!important}
 svg{flex-shrink:0}
 button{font-family:inherit}
 
 /* ---------- TYPO ---------- */
-.ovl h1,.ovl h2,.ovl h3,h1,h3,.scr-ttl,.sec-ttl{font-family:'Bricolage Grotesque',Geist,sans-serif}
+.ovl h1,.ovl h2,.ovl h3,h1,h3,.scr-ttl{font-family:'Bricolage Grotesque',Geist,sans-serif}
 .over{font-size:11px;text-transform:uppercase;letter-spacing:.08em;font-weight:600;color:var(--muted)}
 .scr-ttl{font-size:28px;font-weight:800;letter-spacing:-.02em;line-height:1.1;margin-top:2px}
 
@@ -51,7 +51,7 @@ button{font-family:inherit}
 /* ---------- INPUTS ---------- */
 input,select,textarea{width:100%;min-height:50px;padding:13px 14px;border-radius:15px;border:1px solid #2A3038;background:var(--field);color:var(--txt);font:500 15px Geist,sans-serif;margin-bottom:10px}
 input:focus,select:focus,textarea:focus{outline:none;border-color:var(--lime)}
-input[type=number],.mono-in{font-family:'Geist Mono',monospace;font-variant-numeric:tabular-nums}
+input[type=number]{font-family:'Geist Mono',monospace;font-variant-numeric:tabular-nums}
 label{display:block;font-size:11px;color:var(--muted);margin:0 0 6px;font-weight:600;text-transform:uppercase;letter-spacing:.08em}
 .field{margin-bottom:12px}
 .two{display:grid;grid-template-columns:1fr 1fr;gap:10px}
@@ -173,11 +173,6 @@ h2 .count{background:var(--panel2);color:var(--txt);border-radius:999px;padding:
 .banner.pay .ba button{background:var(--amber);color:var(--bg)}
 
 /* ---------- CHART ---------- */
-.chartbox{background:var(--panel);border:1px solid var(--line);border-radius:var(--r-lg);padding:14px 10px 8px;overflow:hidden}
-.chartbox svg{display:block;width:100%;height:auto}
-.chiplist{display:flex;flex-wrap:wrap;gap:6px;padding:10px 6px 2px}
-.chiplist i{font-style:normal;display:inline-flex;align-items:center;gap:6px;font-size:11.5px;color:var(--muted);background:var(--panel2);border-radius:999px;padding:5px 11px}
-.chiplist i b{width:7px;height:7px;border-radius:50%;display:inline-block}
 
 /* ---------- VALIDATION ---------- */
 .valid{padding:15px 16px;border-top:1px solid var(--sep)}
@@ -200,7 +195,6 @@ nav button.on{color:var(--lime)}
 .sheet h3{display:flex;align-items:center;gap:10px;font-family:'Bricolage Grotesque',Geist,sans-serif;font-size:24px;font-weight:800;letter-spacing:-.02em;margin:0}
 .closex{width:40px;height:40px;min-height:40px;border-radius:50%;border:none;background:var(--field);color:var(--muted);display:grid;place-items:center;cursor:pointer;flex-shrink:0;padding:0}
 .closex:hover{color:var(--txt)}
-.bigamt{font-family:'Geist Mono',monospace;font-variant-numeric:tabular-nums;font-size:54px;font-weight:600;letter-spacing:-.04em;line-height:1;text-align:center;margin:4px 0 14px}
 .tiles{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .tile{background:var(--panel2);border:none;border-radius:var(--r-lg);padding:15px;text-align:left;cursor:pointer;color:var(--txt);display:block;width:100%}
 .tile .tic{width:42px;height:42px;border-radius:var(--r-sm);display:grid;place-items:center;margin-bottom:11px}

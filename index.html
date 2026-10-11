@@ -150,7 +150,7 @@ const parMois = r => Number(r.montant)*(PAR_AN[r.frequence]||12)/12;
 function toast(m){const t=document.createElement('div');t.className='toast';t.textContent=m;document.body.appendChild(t);setTimeout(()=>t.remove(),2600)}
 
 async function google(){
-  const {error} = await SB.auth.signInWithOAuth({provider:'google',options:{redirectTo:location.origin}});
+  const {error} = await SB.auth.signInWithOAuth({provider:'google',options:{redirectTo:location.origin+location.pathname}});
   if(error) toast("Google indisponible — utilise l'e-mail");
 }
 async function magic(){

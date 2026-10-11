@@ -1001,7 +1001,7 @@ function vSet(){
   <div class="list">
     <div class="row"><div class="ic" style="background:var(--blue-bg);color:var(--blue)">${ic('bank',18)}</div>
       <div class="mid"><div class="t">Ponto — flux bancaire</div>
-      <div class="s">${!D.pontoCred ? 'identifiants non renseignés' : (()=>{const d=D.acc.filter(a=>a.derniere_sync).map(a=>new Date(a.derniere_sync)).sort((x,y)=>y-x)[0];
+      <div class="s">${!D.pontoCred ? 'aucune intégration rattachée à ce compte' : (()=>{const d=D.acc.filter(a=>a.derniere_sync).map(a=>new Date(a.derniere_sync)).sort((x,y)=>y-x)[0];
         return d?`dernière synchro : ${d.toLocaleString('fr-FR',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}`:'connecté, pas encore synchronisé'})()}</div></div>
       ${D.pontoCred?`<button class="mini" onclick="syncPonto(true)" aria-label="Synchroniser maintenant" style="border-radius:50%">${ic('sync',15)}</button>`:''}</div>
     <div class="row"><div class="ic" style="background:var(--panel2);color:var(--muted)">${ic('mail',18)}</div>
@@ -1009,8 +1009,7 @@ function vSet(){
     <div class="row"><div class="ic" style="background:var(--panel2);color:var(--muted)">${ic('doc',18)}</div>
       <div class="mid"><div class="t">Digiposte — paie & impôts</div><div class="s">à brancher</div></div></div>
   </div>
-  <div class="two" style="margin-top:10px">
-    <button class="btn" onclick="openPonto()">${D.pontoCred?'Changer les identifiants':'Renseigner les identifiants'}</button>
+  <div style="margin-top:10px">
     <button class="btn" onclick="inventairePonto()">Lister mes comptes</button></div>
 
   <h2>Foyer${D.foyer?` <span class="count">${esc(D.foyer.nom)}</span>`:''}</h2>`;
@@ -1554,21 +1553,6 @@ function openAcc(){
     o.remove(); toast('Compte ajouté'); load();
   };
 }
-function openPonto(){
-  const o=sheet(`<h3><span class="hbadge" style="background:var(--blue-bg);color:var(--blue)">${ic('bank',18)}</span>Identifiants Ponto</h3>
-    <div class="infobox">${ic('lock',18)}<div>Ceux de <b>ton</b> intégration Ponto, à toi seul. Ils sont enregistrés côté serveur et ne sont jamais relus par le navigateur — si tu les perds, régénère le secret dans Ponto.</div></div>
-    <div class="field"><label>Client ID</label><input id="pk_i" autocomplete="off" spellcheck="false"></div>
-    <div class="field"><label>Client Secret</label><input id="pk_s" type="password" autocomplete="new-password" spellcheck="false"></div>
-    <button class="btn primary" id="pk_go">${ic('check',18)} Enregistrer</button>`);
-  o.querySelector('#pk_go').onclick=async()=>{
-    const ci=o.querySelector('#pk_i').value.trim(), cs=o.querySelector('#pk_s').value.trim();
-    if(!ci||!cs) return toast('Les deux champs sont nécessaires');
-    const {error}=await SB.rpc('enregistrer_ponto',{p_client_id:ci,p_client_secret:cs});
-    if(error) return toast(error.message);
-    o.remove(); toast('Identifiants enregistrés'); load();
-  };
-}
-
 function openImpots(){
   const an=new Date().getFullYear();
   const o=sheet(`<h3><span class="hbadge" style="background:var(--amber-bg);color:var(--amber)">${ic('receipt',18)}</span>Régularisation d'impôt</h3>

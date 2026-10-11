@@ -234,7 +234,8 @@ nav .fab.hidden{display:grid!important;visibility:hidden;pointer-events:none}
 /* ---------- DESKTOP (>=900px) ---------- */
 @media (min-width:900px){
   /* place a la nav verticale a gauche */
-  body{padding-bottom:48px;padding-left:132px}
+  body{padding-bottom:48px}
+  #app{padding-left:132px}
   .wrap{max-width:1120px;padding:36px 32px}
 
   /* nav : rail vertical en pilule, meme langage graphique */

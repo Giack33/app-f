@@ -254,12 +254,17 @@ nav .fab.hidden{display:grid!important;visibility:hidden;pointer-events:none}
   h2{margin:38px 0 14px;font-size:22px}
 
   /* hero : jauge a gauche, tuiles a droite */
-  .hero{display:grid;grid-template-columns:minmax(300px,1fr) 1.15fr;
-        align-items:center;gap:30px;text-align:left;padding:28px 30px}
-  .hero>*{grid-column:1}
-  .hero .minitiles{grid-column:2;grid-row:1/99;margin-top:0;align-self:center;
-                   grid-template-columns:1fr}
-  .gauge{margin:4px 0 0}
+  .hero{display:grid;grid-template-columns:minmax(280px,1fr) 1fr;
+        grid-template-rows:auto auto auto auto;
+        align-content:center;gap:4px 34px;text-align:left;padding:26px 30px}
+  .hero .lbl{grid-column:1;grid-row:1}
+  .hero .gauge{grid-column:1;grid-row:2;margin:2px 0 6px;max-width:320px}
+  .hero .sub{grid-column:1;grid-row:3}
+  .hero .verdict{grid-column:1;grid-row:4;justify-self:start;margin-top:12px}
+  .hero .minitiles{grid-column:2;grid-row:1/5;margin-top:0;align-self:center;
+                   grid-template-columns:1fr;gap:12px}
+  .hero .minitile{padding:18px}
+  .hero .minitile .v{font-size:24px}
   .hero .big{font-size:52px}
 
   /* cartes : 3-4 par ligne au lieu de 7 */

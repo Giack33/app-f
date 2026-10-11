@@ -230,3 +230,55 @@ nav .fab.hidden{display:grid!important;visibility:hidden;pointer-events:none}
 .prevcard .pb{display:flex;align-items:center;justify-content:space-between;font-size:11px;text-transform:uppercase;letter-spacing:.08em;font-weight:600}
 .prevcard .pn{font-size:16px;font-weight:700;color:var(--txt);margin-top:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .prevcard .pv{font-family:'Geist Mono',monospace;font-variant-numeric:tabular-nums;font-size:26px;font-weight:600;letter-spacing:-.03em;color:var(--pc);margin-top:2px}
+
+/* ---------- DESKTOP (>=900px) ---------- */
+@media (min-width:900px){
+  /* place a la nav verticale a gauche */
+  body{padding-bottom:48px;padding-left:132px}
+  .wrap{max-width:1120px;padding:36px 32px}
+
+  /* nav : rail vertical en pilule, meme langage graphique */
+  nav{flex-direction:column;justify-content:center;gap:4px;
+      left:24px;right:auto;top:50%;bottom:auto;transform:translateY(-50%);
+      width:92px;height:auto;max-width:none;margin:0;
+      border-radius:46px;padding:16px 0;box-shadow:0 22px 50px rgba(0,0,0,.5)}
+  nav button{width:72px;padding:9px 2px;font-size:10px;line-height:1.15;text-align:center}
+  nav button:hover{color:var(--txt);background:var(--panel2)}
+  nav button.on:hover{color:var(--lime)}
+  .fab{margin:6px 0;width:56px;height:56px;min-height:56px}
+
+  /* ecrans : titres un peu plus grands, respiration */
+  .scr-ttl{font-size:34px}
+  .scrhead{margin-bottom:26px}
+  h2{margin:38px 0 14px;font-size:22px}
+
+  /* hero : jauge a gauche, tuiles a droite */
+  .hero{display:grid;grid-template-columns:minmax(300px,1fr) 1.15fr;
+        align-items:center;gap:30px;text-align:left;padding:28px 30px}
+  .hero>*{grid-column:1}
+  .hero .minitiles{grid-column:2;grid-row:1/99;margin-top:0;align-self:center;
+                   grid-template-columns:1fr}
+  .gauge{margin:4px 0 0}
+  .hero .big{font-size:52px}
+
+  /* cartes : 3-4 par ligne au lieu de 7 */
+  .grid{grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px}
+  .card{padding:18px}
+  .card .v{font-size:25px}
+  .row{padding:14px 18px}
+  .legend{grid-template-columns:repeat(3,1fr)}
+  .histo{height:120px}
+
+  /* feuilles : vraies boites de dialogue centrees */
+  .ovl{place-items:center;padding:32px}
+  .sheet{border-radius:28px;max-width:560px;max-height:86vh;
+         padding:22px 26px 26px;box-shadow:0 30px 80px rgba(0,0,0,.6)}
+  .handle{display:none}
+  .toast{top:22px;left:calc(50% + 66px)}
+}
+
+/* ---------- GRAND ECRAN (>=1400px) ---------- */
+@media (min-width:1400px){
+  .wrap{max-width:1280px}
+  .grid{grid-template-columns:repeat(4,1fr)}
+}

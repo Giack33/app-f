@@ -288,3 +288,17 @@ nav .fab.hidden{display:grid!important;visibility:hidden;pointer-events:none}
   .wrap{max-width:1280px}
   .grid{grid-template-columns:repeat(4,1fr)}
 }
+
+/* PISTE "D'ici le 31" */
+.piste{background:var(--panel);border:1px solid var(--line);border-radius:var(--r-lg);padding:16px}
+.piste .hd{display:flex;justify-content:space-between;align-items:center;gap:10px;font-size:12px;color:var(--dim)}
+.piste .tag{font-family:'Geist Mono',monospace;font-size:11px;padding:3px 9px;border-radius:999px;background:var(--lime-bg);color:var(--lime);white-space:nowrap}
+.piste .tag.neg{background:var(--coral-bg);color:var(--coral)}
+.piste .big{font-family:'Geist Mono',monospace;font-variant-numeric:tabular-nums;font-size:34px;font-weight:600;letter-spacing:-.04em;margin-top:12px;line-height:1.1}
+.piste .big small{font-family:'Geist',sans-serif;font-size:14px;font-weight:500;letter-spacing:0;color:var(--dim)}
+.piste .track{display:flex;gap:3px;margin-top:18px}
+.piste .track i{flex:1;height:30px;border-radius:4px;min-width:0}
+.piste .track i.auj{outline:2px solid var(--txt);outline-offset:1px}
+.piste .leg{display:flex;justify-content:space-between;gap:6px;font-family:'Geist Mono',monospace;font-size:10px;color:var(--faint);margin-top:7px}
+.piste .ft{display:flex;justify-content:space-between;margin-top:14px;padding-top:12px;border-top:1px solid var(--sep);font-size:12.5px;color:var(--dim)}
+.piste .ft b{font-family:'Geist Mono',monospace;font-weight:600;color:var(--txt)}

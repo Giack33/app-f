@@ -9,7 +9,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<link rel="stylesheet" href="styles.css?v=5">
+<link rel="stylesheet" href="styles.css?v=6">
 </head>
 <body>
 
@@ -546,7 +546,6 @@ function render(){
   document.getElementById('htitle').textContent=TITRES[TAB];
   document.getElementById('view').innerHTML={home:vHome,flux:vFlux,fixe:vFixe,set:vSet}[TAB]();
   document.querySelector('.fab').classList.toggle('hidden',TAB==='set');
-  if(TAB==='home') drawChart();
   if(TAB==='flux') renderFlux();
 }
 function go(t){TAB=t;render();window.scrollTo(0,0)}
@@ -610,8 +609,8 @@ function vHome(){
   }
 
   h+=`<h2>D'ici le ${dernier} <span class="count" style="color:${m.negPrevu?'var(--coral)':'var(--lime)'};background:${m.negPrevu?'var(--coral-bg)':'var(--lime-bg)'}">${m.negPrevu?'passage en négatif':'jamais en négatif'}</span></h2>
-    <div class="chartbox"><div id="chart"></div></div>`;
-  if(!m.quotidien) h+=`<div class="note">Les dépenses du quotidien ne sont pas encore estimées : la courbe ne tient compte que des charges connues.</div>`;
+    ${vPiste(m)}`;
+  if(!m.quotidien) h+=`<div class="note">Les dépenses du quotidien ne sont pas encore estimées : la piste ne tient compte que des charges connues.</div>`;
 
   h+=`<h2>Ce qui tombe bientôt <span class="count">${eur0(m.totalAVenirMois)}</span></h2>`;
   if(m.aVenirMois.length){
@@ -655,6 +654,35 @@ function vHome(){
     h+=`</div><div class="note">Soit ${eur0((totAbo+totDet)*12)} sur l'année.${det.length?` Les lignes ambre sont détectées automatiquement : « + » pour les suivre, « ✕ » pour les masquer.`:''}</div>`;
   }
   return h;
+}
+
+function vPiste(m){
+  const so=Number(D.set.seuil_orange??200), sr=Number(D.set.seuil_rouge??50);
+  const M=new Date().getMonth();
+  const jours=m.proj.filter(x=>x.d.getMonth()===M);
+  if(!jours.length) return '';
+  const jour0=d=>new Date(d.getFullYear(),d.getMonth(),d.getDate());
+  const pe=(m.prochaine&&m.prochaine.date.getMonth()===M)?jour0(m.prochaine.date):null;
+  const apresEntree=x=>pe&&x.d>=pe;
+  const avant=jours.filter(x=>!apresEntree(x));
+  const bas=(avant.length?avant:jours).reduce((a,b)=>b.bal<a.bal?b:a);
+  const neg=avant.find(x=>x.bal<0);
+  const coul=x=>apresEntree(x)?'var(--lime)':x.bal<sr?'var(--coral)':x.bal<so?'var(--amber)':'#6E7E3A';
+  const serres=avant.filter(x=>x.bal<so);
+  const fin=jours[jours.length-1];
+  const nomE=m.prochaine?esc(m.prochaine.nom):'';
+
+  let h=`<div class="piste"><div class="hd">`;
+  h+=neg?`<span>Passage en négatif le ${neg.d.getDate()}</span><span class="tag neg">attention</span>`
+        :`<span>${pe?`Tu tiens jusqu'à ${nomE}`:"Tu tiens jusqu'à la fin du mois"}</span><span class="tag">${m.joursAvantEntree} j de marge</span>`;
+  h+=`</div><div class="big">${eur0(bas.bal)}<small> au plus bas, le ${bas.d.getDate()}</small></div>`;
+  h+=`<div class="track">`+jours.map((x,i)=>`<i class="${i===0?'auj':''}" style="background:${coul(x)}" title="${x.d.getDate()} : ${eur0(x.bal)}"></i>`).join('')+`</div>`;
+  h+=`<div class="leg"><span>auj. ${jours[0].d.getDate()}</span>`;
+  if(serres.length) h+=`<span style="color:var(--amber)">zone serrée ${serres[0].d.getDate()}${serres.length>1?'–'+serres[serres.length-1].d.getDate():''}</span>`;
+  h+=pe?`<span style="color:var(--lime)">${nomE.toLowerCase()} ${pe.getDate()}</span>`:`<span>${fin.d.getDate()}</span>`;
+  h+=`</div>`;
+  if(pe) h+=`<div class="ft"><span>Après le ${pe.getDate()}</span><b>${eur0(fin.bal)} au ${fin.d.getDate()}</b></div>`;
+  return h+`</div>`;
 }
 
 function drawChart(){

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src https://rjnysyddgpcjzmfbpyba.supabase.co wss://rjnysyddgpcjzmfbpyba.supabase.co; base-uri 'none'; form-action 'none'; object-src 'none'; frame-src 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.3; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src https://rjnysyddgpcjzmfbpyba.supabase.co wss://rjnysyddgpcjzmfbpyba.supabase.co; base-uri 'none'; form-action 'none'; object-src 'none'; frame-src 'none'">
 <title>Trésorerie</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='8' fill='%230D0F12'/><path d='M6 23a10 10 0 0 1 20 0' fill='none' stroke='%23262B33' stroke-width='3.6' stroke-linecap='round'/><path d='M6 23a10 10 0 0 1 14.5-8.9' fill='none' stroke='%23D4F25C' stroke-width='3.6' stroke-linecap='round'/></svg>">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -66,6 +66,10 @@ const eur = n => (n<0?'-':'')+Math.abs(n).toLocaleString('fr-FR',{minimumFractio
 const eur0 = n => (n<0?'-':'')+Math.abs(Math.round(n)).toLocaleString('fr-FR')+' €';
 const esc = s => String(s==null?'':s).replace(/[<>&"]/g,c=>({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]));
 const jsq = s => String(s==null?'':s).replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+// Une couleur venant de la base finit dans un attribut style : on n'accepte que #RRGGBB.
+const col6 = c => /^#[0-9A-Fa-f]{6}$/.test(String(c||'')) ? String(c) : '#9BA3AD';
+// Anti-clickjacking : GitHub Pages n'envoie pas X-Frame-Options, on refuse l'affichage en cadre.
+if (self !== top) { try { top.location = self.location } catch(e) {} document.documentElement.innerHTML=''; throw new Error('cadre refuse'); }
 const PERIODE={hebdomadaire:'par semaine',mensuel:'par mois',bimestriel:'tous les 2 mois',trimestriel:'par trimestre',semestriel:'par semestre',annuel:'par an'};
 const PAR_AN={hebdomadaire:52,mensuel:12,bimestriel:6,trimestriel:4,semestriel:2,annuel:1};
 const parMois = r => Number(r.montant)*(PAR_AN[r.frequence]||12)/12;
@@ -119,7 +123,7 @@ async function magic(){
   if(!email) return toast('Entre ton e-mail');
   // shouldCreateUser:false — aucune inscription depuis l'appli : seuls les comptes
   // deja crees dans Supabase peuvent demander un lien de connexion.
-  const {error} = await SB.auth.signInWithOtp({email,options:{emailRedirectTo:location.origin,shouldCreateUser:false}});
+  const {error} = await SB.auth.signInWithOtp({email,options:{emailRedirectTo:location.origin+location.pathname,shouldCreateUser:false}});
   if(error) return toast(/not allowed|signups not allowed|Signups not allowed/i.test(error.message)
     ? "Cette adresse n'a pas de compte sur l'appli." : error.message);
   toast('Lien envoyé ! Regarde ta boîte mail.');
@@ -619,7 +623,7 @@ function vHome(){
           <div class="s">${new Date(t.date_operation+'T00:00:00').toLocaleDateString('fr-FR',{day:'numeric',month:'long'})}${accNom(t.account_id)?` · <span style="color:${accCol(t.account_id)}">${esc(accNom(t.account_id))}</span>`:''}</div></div>
           <div class="amt ${Number(t.montant)<0?'neg':'pos'}" style="font-size:19px">${eur(Number(t.montant))}</div></div>
         <div class="chips">${D.cats.filter(c=>c.type!=='revenu').map(c=>
-          `<button class="chip" onclick="classe('${t.id}','${c.id}','${jsq(t.libelle)}')"><b style="background:${c.couleur||'#9BA3AD'}"></b>${esc(c.nom)}</button>`).join('')}</div></div>`;
+          `<button class="chip" onclick="classe('${t.id}','${c.id}','${jsq(t.libelle)}')"><b style="background:${col6(c.couleur)}"></b>${esc(c.nom)}</button>`).join('')}</div></div>`;
     });
     h+=`</div>`;
   }
@@ -646,7 +650,7 @@ function vHome(){
   h+=`<h2 class="clic" onclick="openDepMois()">Dépenses du mois <span class="count">${eur0(m.depMois)}</span></h2>`;
   h+=cats.length?`<div class="list">`+cats.map(([n,v])=>{
       const prec=m.parCatPrec[n]||0, diff=prec?Math.round((v-prec)/prec*100):null;
-      const col=D.cats.find(c=>c.nom===n)?.couleur||'#9BA3AD';
+      const col=col6(D.cats.find(c=>c.nom===n)?.couleur);
       return `<div class="row clic" onclick="openDepMois('${jsq(n)}')" style="display:block">
         <div style="display:flex;justify-content:space-between;gap:10px;align-items:baseline">
           <div class="t">${esc(n)}</div><div class="amt">${eur0(v)}</div></div>
@@ -852,8 +856,8 @@ function renderFlux(){
       <div class="over" style="color:var(--faint)">${g.ops.length} op${g.ops.length>1?'s':''} · ${eur0(tot)}</div></div>
     <div class="list">`+g.ops.map(t=>{
       const c=D.catById[t.category_id], acl=t.statut==='a_valider'||!c;
-      const col=acl?'var(--amber)':(c?c.couleur:'var(--muted)');
-      const bg=acl?'var(--amber-bg)':(c&&c.couleur?c.couleur+'22':'var(--panel2)');
+      const col=acl?'var(--amber)':(c?col6(c.couleur):'var(--muted)');
+      const bg=acl?'var(--amber-bg)':(c&&c.couleur?col6(c.couleur)+'22':'var(--panel2)');
       const ac=accCol(t.account_id), an=accNom(t.account_id);
       return `<div class="row" onclick="openClasser('${t.id}')" style="cursor:pointer"><i class="accstripe" style="background:${ac}" title="${esc(an)}"></i>
         <div class="ic" style="background:${bg};color:${col}">${acl?ic('quest',18):esc((c.nom||'?').trim().charAt(0).toUpperCase())}</div>
@@ -872,7 +876,7 @@ function vFixe(){
   // --- recap : total + barre empilee par categorie ---
   const parCatRec={};
   D.rec.forEach(r=>{ const c=D.catById[r.category_id];
-    const n=c?c.nom:'Autre', col=(c&&c.couleur)||'#9BA3AD';
+    const n=c?c.nom:'Autre', col=col6(c&&c.couleur);
     if(!parCatRec[n]) parCatRec[n]={v:0,col};
     parCatRec[n].v+=parMois(r); });
   const segs=Object.entries(parCatRec).sort((a,b)=>b[1].v-a[1].v);
@@ -892,7 +896,7 @@ function vFixe(){
     const lisse=r.frequence!=='mensuel'?` · ${eur0(parMois(r))}/mois lissé`:'';
     const quand=r.frequence==='mensuel'?`le ${r.jour_prelevement||'?'} du mois`
       :(r.prochaine_echeance?`prochaine : ${new Date(r.prochaine_echeance+'T00:00:00').toLocaleDateString('fr-FR',{day:'numeric',month:'short',year:'2-digit'})}`:PERIODE[r.frequence]);
-    const c=D.catById[r.category_id], col=(c&&c.couleur)||'#9BA3AD';
+    const c=D.catById[r.category_id], col=col6(c&&c.couleur);
     return `<div class="row"><div class="ic" style="background:${col}22;color:${col}">${r.est_abonnement?ic('repeat',18):esc((c?c.nom:'·').trim().charAt(0).toUpperCase())}</div>
       <div class="mid"><div class="t">${esc(r.nom)}</div><div class="s">${quand}${lisse}</div></div>
       <div class="amt neg">${eur(-r.montant)}</div>
@@ -1116,7 +1120,7 @@ function openClasser(txId){
       <div style="font-size:12px;color:var(--muted);margin-top:3px">${new Date(t.date_operation+'T00:00:00').toLocaleDateString('fr-FR',{day:'numeric',month:'long',year:'numeric'})}${an?` · <span style="color:${ac}">${esc(an)}</span>`:''}</div>
       <div class="amt ${Number(t.montant)<0?'neg':'pos'}" style="font-size:22px;margin-top:8px">${eur(Number(t.montant))}</div>
     </div>
-    <div class="chips">${cats.map(c=>`<button class="chip${c.id===t.category_id?' on':''}" onclick="reclasse('${t.id}','${c.id}')"><b style="background:${c.couleur||'#9BA3AD'}"></b>${esc(c.nom)}</button>`).join('')}</div>`;
+    <div class="chips">${cats.map(c=>`<button class="chip${c.id===t.category_id?' on':''}" onclick="reclasse('${t.id}','${c.id}')"><b style="background:${col6(c.couleur)}"></b>${esc(c.nom)}</button>`).join('')}</div>`;
   sheet(h);
 }
 
@@ -1157,7 +1161,7 @@ function openDepMois(cat){
     const acl=t.statut==='a_valider'||!c;
     const ac=accCol(t.account_id), an=a?a.nom:'';
     h+=`<div class="row" onclick="openClasser('${t.id}')" style="cursor:pointer"><i class="accstripe" style="background:${ac}" title="${esc(an)}"></i>
-      <div class="ic" style="background:${acl?'var(--amber-bg)':(c.couleur?c.couleur+'22':'var(--panel2)')};color:${acl?'var(--amber)':(c.couleur||'var(--muted)')}">${acl?ic('quest',18):esc((c.nom||'?').trim().charAt(0).toUpperCase())}</div>
+      <div class="ic" style="background:${acl?'var(--amber-bg)':(c.couleur?col6(c.couleur)+'22':'var(--panel2)')};color:${acl?'var(--amber)':(c.couleur?col6(c.couleur):'var(--muted)')}">${acl?ic('quest',18):esc((c.nom||'?').trim().charAt(0).toUpperCase())}</div>
       <div class="mid"><div class="t">${esc(t.libelle)}</div>
       <div class="s">${acl?'<b style="color:var(--amber);font-weight:600">à classer</b>':esc(c.nom)}${an?` · <span style="color:${ac}">${esc(an)}</span>`:''}</div></div>
       <div class="amt neg">${eur(Number(t.montant))}</div></div>`;
@@ -1245,7 +1249,7 @@ function openAdd(){
     <label>Catégorie</label>
     <select id="a_cat" class="hidden">${D.cats.map(c=>`<option value="${c.id}">${esc(c.nom)}</option>`).join('')}</select>
     <div class="chips" id="a_ch" style="margin-bottom:4px">${D.cats.map(c=>
-      `<button type="button" class="chip" data-id="${c.id}" data-rev="${c.type==='revenu'?1:0}"><b style="background:${c.couleur||'#9BA3AD'}"></b>${esc(c.nom)}</button>`).join('')}</div>
+      `<button type="button" class="chip" data-id="${c.id}" data-rev="${c.type==='revenu'?1:0}"><b style="background:${col6(c.couleur)}"></b>${esc(c.nom)}</button>`).join('')}</div>
     <button class="btn primary" id="a_go" style="margin-top:16px">${ic('check',18)} Enregistrer</button>`);
 
   const sel=o.querySelector('#a_cat'), mt=o.querySelector('#a_mt');

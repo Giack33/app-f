@@ -119,7 +119,7 @@ async function logout(){ await SB.auth.signOut(); location.reload() }
 
 /* ---------- CHARGEMENT ---------- */
 async function load(){
-  const [s,c,a,t,r,i,d,fy,fm,fi,pr,pc,fp,ed] = await Promise.all([
+  const [s,c,a,t,r,i,d,fy,fm,fi,pr,pc,fp,ed,cr] = await Promise.all([
     SB.from('settings').select('*').maybeSingle(),
     SB.from('categories').select('*').order('type').order('nom'),
     SB.from('accounts').select('*').eq('actif',true),
@@ -133,11 +133,12 @@ async function load(){
     SB.from('profiles').select('id,email,full_name'),
     SB.rpc('ponto_configure'),
     SB.from('frais_pro').select('*').order('mois',{ascending:false}).limit(24),
-    SB.from('edf_conso').select('*').order('mois')
+    SB.from('edf_conso').select('*').order('mois'),
+    SB.from('categorization_rules').select('*').order('priorite')
   ]);
   D = {set:s.data||{}, cats:c.data||[], acc:a.data||[], tx:t.data||[], rec:r.data||[], inc:i.data||[], docs:d.data||[],
        foyer:fy.data||null, membres:fm.data||[], invits:fi.data||[], profils:pr.data||[],
-       pontoCred:pc.data||null, pro:fp.data||[], edf:ed.data||[]};  // horodatage de configuration, jamais les identifiants
+       pontoCred:pc.data||null, pro:fp.data||[], edf:ed.data||[], regles:cr.data||[]};  // horodatage de configuration, jamais les identifiants
   // Toutes les catégories servent à résoudre les libellés (dont celles du conjoint) ;
   // au choix on ne propose que les actives, dédoublonnées par nom.
   D.catById = Object.fromEntries(D.cats.map(x=>[x.id,x]));
@@ -154,6 +155,7 @@ async function load(){
     const {data}=await SB.from('frais_pro').select('*').order('mois',{ascending:false}).limit(24);
     D.pro=data||[];
   }
+  await autoClasser();
   render();
   notifsFraisPro();
 }
@@ -1028,13 +1030,60 @@ function vSet(){
   return h;
 }
 
+/* ---------- CLASSEMENT AUTOMATIQUE ---------- */
+// Un libelle deja classe devient une regle : toute operation portant le meme libelle
+// est classee automatiquement, a la synchro (edge function ponto-sync) comme ici au
+// chargement, pour les operations deja en base quand la regle est apprise.
+function cleMotif(s){
+  return (s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase()
+    .replace(/CARTE\s+X?\d+/g,' ')
+    .replace(/\d+[\/.\-]\d+([\/.\-]\d+)?/g,' ')
+    .replace(/[^A-Z ]/g,' ').replace(/\s+/g,' ').trim();
+}
+function regleDe(lib){
+  const k=cleMotif(lib); if(!k) return null;
+  const rs=D.regles||[];
+  return rs.find(r=>cleMotif(r.motif)===k)
+      || rs.find(r=>{const m=cleMotif(r.motif); return m.length>=6 && k.includes(m)})
+      || null;
+}
+// Applique les regles connues aux operations encore sans categorie.
+async function autoClasser(){
+  if(!(D.regles||[]).length) return;
+  const parCat={};
+  D.tx.forEach(t=>{
+    if(t.category_id) return;
+    const r=regleDe(t.libelle); if(!r) return;
+    (parCat[r.category_id]=parCat[r.category_id]||[]).push(t);
+  });
+  let n=0;
+  for(const cat of Object.keys(parCat)){
+    const lst=parCat[cat];
+    const {data}=await SB.from('transactions').update({category_id:cat,statut:'confirmee'}).in('id',lst.map(t=>t.id)).select('id');
+    const ok=new Set((data||[]).map(x=>x.id));
+    lst.forEach(t=>{ if(ok.has(t.id)){ t.category_id=cat; t.statut='confirmee'; n++; } });
+  }
+  if(n) toast(n+' operation'+(n>1?'s':'')+' classee'+(n>1?'s':'')+' automatiquement');
+}
+// Memorise le libelle comme regle, puis classe les operations au meme libelle :
+// celles sans categorie, et celles que l'ancienne regle avait envoyees ailleurs.
+async function apprendre(t,catId){
+  const motif=cleMotif(t&&t.libelle); if(!motif) return 0;
+  const ancienne=(D.regles||[]).find(r=>cleMotif(r.motif)===motif);
+  await SB.from('categorization_rules').upsert({user_id:U.id,category_id:catId,motif,priorite:50},{onConflict:'user_id,motif'});
+  const cibles=D.tx.filter(x=>x.id!==(t&&t.id) && cleMotif(x.libelle)===motif &&
+    (!x.category_id || x.statut==='a_valider' || (ancienne && x.category_id===ancienne.category_id)));
+  if(!cibles.length) return 0;
+  const {data}=await SB.from('transactions').update({category_id:catId,statut:'confirmee'}).in('id',cibles.map(x=>x.id)).select('id');
+  return (data||[]).length;
+}
+
 /* ---------- ACTIONS ---------- */
 async function classe(txId,catId,libelle){
   const {error}=await SB.from('transactions').update({category_id:catId,statut:'confirmee'}).eq('id',txId);
   if(error) return toast(error.message);
-  const motif=(libelle||'').toUpperCase().split(/[\s*]+/).filter(w=>w.length>3)[0];
-  if(motif) await SB.from('categorization_rules').upsert({user_id:U.id,category_id:catId,motif},{onConflict:'user_id,motif'});
-  toast('Classé'); load();
+  const n=await apprendre({id:txId,libelle},catId);
+  toast(n?`Classé · ${n} identique${n>1?'s':''} aussi`:'Classé'); load();
 }
 
 async function reclasse(txId,catId){
@@ -1042,7 +1091,9 @@ async function reclasse(txId,catId){
   if(error) return toast(error.message);
   if(!data||!data.length) return toast("Cette opération n'est pas modifiable ici");
   document.querySelectorAll('.ovl').forEach(o=>o.remove());
-  toast('Catégorie enregistrée'); load();
+  const n=await apprendre(D.tx.find(x=>x.id===txId),catId);
+  toast(n?`Classé · ${n} opération${n>1?'s':''} identique${n>1?'s':''} aussi`:'Catégorie enregistrée');
+  load();
 }
 
 function openClasser(txId){

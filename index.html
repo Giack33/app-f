@@ -511,8 +511,8 @@ function aPrevoir(){
     });
   });
 
-  const ep=Number(D.set.objectif_epargne_mensuel||0);
-  if(ep>0) lignes.push({nom:"Objectif d'epargne",montant:ep,date:debut,type:'epargne'});
+  // Pas d'objectif d'epargne ici : il ferait doublon avec le versement PER,
+  // deja compte parmi les charges fixes.
 
   const dimF=fin.getDate();
   abosDetectes().forEach(a=>lignes.push({nom:a.nom,montant:a.montant,type:'abo_detecte',
@@ -526,7 +526,7 @@ function aPrevoir(){
   lignes.sort((a,b)=>(a.date&&b.date)?a.date-b.date:(a.date?-1:(b.date?1:b.montant-a.montant)));
   const par=t=>lignes.filter(x=>x.type===t).reduce((s,x)=>s+x.montant,0);
   return {debut,fin,lignes,total:lignes.reduce((s,x)=>s+x.montant,0),
-          fixes:par('fixe'),epargne:par('epargne'),abosDet:par('abo_detecte'),variables:par('variable'),
+          fixes:par('fixe'),abosDet:par('abo_detecte'),variables:par('variable'),
           nomMois:debut.toLocaleDateString('fr-FR',{month:'long'})};
 }
 
@@ -976,12 +976,12 @@ function openASortir(){
 
 function openPrevoir(){
   const ap=aPrevoir();
-  const ICO={fixe:'🏠',epargne:'🐷',abo_detecte:'?',variable:'🛒'};
-  const TTL={fixe:'Charges fixes',epargne:'Épargne',abo_detecte:'Abonnements détectés',variable:'Dépenses contraintes estimées'};
+  const ICO={fixe:'🏠',abo_detecte:'?',variable:'🛒'};
+  const TTL={fixe:'Charges fixes',abo_detecte:'Abonnements détectés',variable:'Dépenses contraintes estimées'};
   const nm=ap.debut.toLocaleDateString('fr-FR',{month:'long',year:'numeric'});
   let h=`<h3>À prévoir — ${nm} <span class="count">${eur0(ap.total)}</span></h3>
     <div style="color:var(--dim);font-size:12.5px;margin:-10px 0 14px">du 1er au ${ap.fin.getDate()} ${ap.nomMois} · frais pro Generali exclus (compte N26)</div>`;
-  ['fixe','epargne','abo_detecte','variable'].forEach(t=>{
+  ['fixe','abo_detecte','variable'].forEach(t=>{
     const l=ap.lignes.filter(x=>x.type===t); if(!l.length) return;
     const tot=l.reduce((s,x)=>s+x.montant,0);
     h+=`<h2>${TTL[t]} <span class="count">${eur0(tot)}</span></h2>`;

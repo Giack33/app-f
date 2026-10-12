@@ -210,7 +210,7 @@ nav button.on{color:var(--lime)}
 .clic{cursor:pointer;-webkit-tap-highlight-color:transparent}
 .clic:active{opacity:.6}
 h2.clic .count:after{content:" \203A";font-weight:700}
-.toast{position:fixed;top:14px;left:50%;transform:translateX(-50%);background:var(--panel2);border:1px solid var(--line2);padding:12px 18px;border-radius:999px;font-size:14px;font-weight:500;z-index:99;max-width:90vw;text-align:center}
+.toast{position:fixed;top:calc(14px + env(safe-area-inset-top));left:50%;transform:translateX(-50%);background:var(--panel2);border:1px solid var(--line2);padding:12px 18px;border-radius:999px;font-size:14px;font-weight:500;z-index:99;max-width:90vw;text-align:center}
 
 /* fab masqué sans casser la pilule */
 nav .fab.hidden{display:grid!important;visibility:hidden;pointer-events:none}
@@ -276,7 +276,7 @@ nav .fab.hidden{display:grid!important;visibility:hidden;pointer-events:none}
   .sheet{border-radius:28px;max-width:560px;max-height:86vh;
          padding:22px 26px 26px;box-shadow:0 30px 80px rgba(0,0,0,.6)}
   .handle{display:none}
-  .toast{top:22px;left:calc(50% + 66px)}
+  .toast{top:calc(22px + env(safe-area-inset-top));left:calc(50% + 66px)}
 }
 
 /* ---------- GRAND ECRAN (>=1400px) ---------- */

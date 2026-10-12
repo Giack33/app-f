@@ -129,7 +129,7 @@ async function logout(){ await SB.auth.signOut(); location.reload() }
 
 /* ---------- CHARGEMENT ---------- */
 async function load(){
-  const [s,c,a,t,r,i,d,fy,fm,fi,pr,pc,fp,ed,cr] = await Promise.all([
+  const [s,c,a,t,r,i,d,fy,fm,fi,pr,fp,ed,cr] = await Promise.all([
     SB.from('settings').select('*').maybeSingle(),
     SB.from('categories').select('*').order('type').order('nom'),
     SB.from('accounts').select('*').eq('actif',true),
@@ -141,14 +141,13 @@ async function load(){
     SB.from('foyer_membres').select('*'),
     SB.from('foyer_invitations').select('*'),
     SB.from('profiles').select('id,email,full_name'),
-    SB.rpc('ponto_configure'),
     SB.from('frais_pro').select('*').order('mois',{ascending:false}).limit(24),
     SB.from('edf_conso').select('*').order('mois'),
     SB.from('categorization_rules').select('*').order('priorite')
   ]);
   D = {set:s.data||{}, cats:c.data||[], acc:a.data||[], tx:t.data||[], rec:r.data||[], inc:i.data||[], docs:d.data||[],
        foyer:fy.data||null, membres:fm.data||[], invits:fi.data||[], profils:pr.data||[],
-       pontoCred:pc.data||null, pro:fp.data||[], edf:ed.data||[], regles:cr.data||[]};  // horodatage de configuration, jamais les identifiants
+       obio:(a.data||[]).some(x=>x.source==='obio'), pro:fp.data||[], edf:ed.data||[], regles:cr.data||[]};  // obio : au moins un compte relie a open-banking.io
   // Toutes les catégories servent à résoudre les libellés (dont celles du conjoint) ;
   // au choix on ne propose que les actives, dédoublonnées par nom.
   D.catById = Object.fromEntries(D.cats.map(x=>[x.id,x]));
@@ -572,7 +571,7 @@ function vHome(){
   const dernier=m.finMois.getDate();
   const ratio=Math.max(0,Math.min(1,m.reste/((m.reste+m.depMois)||1)));
   const inits=((U&&U.email)||'').replace(/[^a-zA-Z]/g,'').slice(0,2).toUpperCase()||'MOI';
-  const sync=D.pontoCred?`<button class="iconbtn" onclick="syncPonto(true)" aria-label="Synchroniser les comptes">${ic('sync',20)}</button>`:'';
+  const sync=D.obio?`<button class="iconbtn" onclick="syncBanque(true)" aria-label="Synchroniser les comptes">${ic('sync',20)}</button>`:'';
   let h=hd(new Date().toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'}),'Pilotage',sync+`<div class="avat">${inits}</div>`);
 
   h+=`<div class="hero" style="--heroc:${m.couleur};--herobg:${TINT[m.couleur]||'var(--panel2)'}">
@@ -887,7 +886,7 @@ function vSet(){
   h+=`<h2>Comptes bancaires <span class="count">${eur0(totSoldes)}</span></h2>`;
   h+=D.acc.length?`<div class="list">`+D.acc.map(a=>`<div class="row">
     <div class="ic" style="background:${a.type==='epargne'?'var(--teal-bg)':'var(--blue-bg)'};color:${a.type==='epargne'?'var(--teal)':'var(--blue)'};font-size:11.5px">${abr(a)}</div>
-    <div class="mid"><div class="t">${esc(a.nom)}</div><div class="s">${esc(a.banque||'')} · ${a.exclu_budget?'hors budget perso':(a.source==='ponto'?'synchronisé':'saisi à la main')}</div></div>
+    <div class="mid"><div class="t">${esc(a.nom)}</div><div class="s">${esc(a.banque||'')} · ${a.exclu_budget?'hors budget perso':(a.source==='obio'||a.source==='ponto'?'synchronisé':'saisi à la main')}</div></div>
     <div class="amt ${Number(a.solde)<0?'neg':''}">${eur(Number(a.solde))}</div>
     <button class="mini" onclick="majSolde('${a.id}',${Number(a.solde)})" aria-label="Modifier le solde">${ic('edit',15)}</button>
     ${D.foyer?`<button class="mini" aria-label="${a.foyer_id?'Partagé avec le foyer':'Compte privé'}" onclick="togglePartage('${a.id}',${a.foyer_id?'true':'false'})" style="${a.foyer_id?'color:var(--blue);border-color:#2C4460':''}">${a.foyer_id?ic('users',15):ic('lock',15)}</button>`:''}</div>`).join('')+`</div>`
@@ -909,10 +908,10 @@ function vSet(){
   <h2>Connexions</h2>
   <div class="list">
     <div class="row"><div class="ic" style="background:var(--blue-bg);color:var(--blue)">${ic('bank',18)}</div>
-      <div class="mid"><div class="t">Ponto — flux bancaire</div>
-      <div class="s">${!D.pontoCred ? 'aucune intégration rattachée à ce compte' : (()=>{const d=D.acc.filter(a=>a.derniere_sync).map(a=>new Date(a.derniere_sync)).sort((x,y)=>y-x)[0];
+      <div class="mid"><div class="t">open-banking.io — flux bancaire</div>
+      <div class="s">${!D.obio ? 'aucune intégration rattachée à ce compte' : (()=>{const d=D.acc.filter(a=>a.derniere_sync).map(a=>new Date(a.derniere_sync)).sort((x,y)=>y-x)[0];
         return d?`dernière synchro : ${d.toLocaleString('fr-FR',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'})}`:'connecté, pas encore synchronisé'})()}</div></div>
-      ${D.pontoCred?`<button class="mini" onclick="syncPonto(true)" aria-label="Synchroniser maintenant" style="border-radius:50%">${ic('sync',15)}</button>`:''}</div>
+      ${D.obio?`<button class="mini" onclick="syncBanque(true)" aria-label="Synchroniser maintenant" style="border-radius:50%">${ic('sync',15)}</button>`:''}</div>
   </div>
 
   <h2>Foyer${D.foyer?` <span class="count">${esc(D.foyer.nom)}</span>`:''}</h2>`;
@@ -940,7 +939,7 @@ function vSet(){
 
 /* ---------- CLASSEMENT AUTOMATIQUE ---------- */
 // Un libelle deja classe devient une regle : toute operation portant le meme libelle
-// est classee automatiquement, a la synchro (edge function ponto-sync) comme ici au
+// est classee automatiquement, a la synchro (edge function obio-sync) comme ici au
 // chargement, pour les operations deja en base quand la regle est apprise.
 function cleMotif(s){
   return (s||'').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toUpperCase()
@@ -1468,14 +1467,14 @@ function openImpots(){
 }
 
 let syncEnCours=false;
-async function syncPonto(forcer){
+async function syncBanque(forcer){
   if(syncEnCours) return;
   syncEnCours=true;
   if(forcer) toast('Synchronisation en cours…');
   try{
     const {data:{session}} = await SB.auth.getSession();
     if(!session) return;
-    const r = await fetch('https://rjnysyddgpcjzmfbpyba.supabase.co/functions/v1/ponto-sync',{
+    const r = await fetch('https://rjnysyddgpcjzmfbpyba.supabase.co/functions/v1/obio-sync',{
       method:'POST',
       headers:{'Content-Type':'application/json','Authorization':`Bearer ${session.access_token}`},
       body:JSON.stringify({forcer:!!forcer})
@@ -1536,8 +1535,8 @@ SB.auth.onAuthStateChange(async(_e,s)=>{
     document.getElementById('login').classList.add('hidden');
     document.getElementById('app').classList.remove('hidden');
     await load();
-    // Resynchronisation à l'ouverture, seulement si l'utilisateur a configuré son Ponto
-    if(D.pontoCred) syncPonto(true);
+    // Resynchronisation à l'ouverture, seulement si un compte est relié à open-banking.io
+    if(D.obio) syncBanque(true);
   }else{
     document.getElementById('login').classList.remove('hidden');
     document.getElementById('app').classList.add('hidden');

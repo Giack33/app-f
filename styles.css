@@ -16,7 +16,7 @@
 html{-webkit-text-size-adjust:100%}
 body{background:var(--bg);color:var(--txt);font-family:Geist,system-ui,-apple-system,sans-serif;-webkit-font-smoothing:antialiased;padding-bottom:100px;overflow-x:hidden}
 .amt,.card .v,.hero .big{font-family:'Geist Mono',ui-monospace,monospace;font-variant-numeric:tabular-nums;font-weight:600;letter-spacing:-.02em}
-.wrap{max-width:860px;margin:0 auto;padding:calc(16px + env(safe-area-inset-top)) calc(16px + env(safe-area-inset-right)) 16px calc(16px + env(safe-area-inset-left))}
+.wrap{max-width:860px;margin:0 auto;padding:max(10px, env(safe-area-inset-top)) calc(16px + env(safe-area-inset-right)) 16px calc(16px + env(safe-area-inset-left))}
 .hidden{display:none!important}
 svg{flex-shrink:0}
 button{font-family:inherit}

@@ -500,6 +500,14 @@ function parJourMoyen(){
 }
 // Ni train de vie, ni dépense reelle : les charges fixes (deja projetees a leur date),
 // l'epargne (mise de cote, pas depensee), les frais pro (rembourses) et les transferts internes.
+// Ni entree ni sortie reelle : virement entre ses propres comptes (ou ceux du foyer)
+// et frais pro rembourses. Complete marquerVirementsInternes(), qui ne voit que les
+// virements dont les deux cotes sont synchronises (le N26 et le compte prive de
+// Nawelle ne le sont pas, d'ou des virements internes vus comme entrees/sorties).
+function transfertOuPro(t){
+  const c=D.catById[t.category_id];
+  return !!c && /transfert|frais pro/i.test(c.nom||'');
+}
 function depenseNeutre(t){
   const c=D.catById[t.category_id];
   if(!c) return false;
@@ -704,8 +712,10 @@ function vPiste(m){
 
 function vFlux(){
   const now=new Date(), AN=now.getFullYear(), MO=now.getMonth();
-  const mois=D.tx.filter(t=>{const d=new Date(t.date_operation+'T00:00:00');
-    return d.getFullYear()===AN&&d.getMonth()===MO&&!t.interne});
+  const mois=D.tx.filter(t=>{
+    if(t.interne || t.statut==='ignoree' || transfertOuPro(t)) return false;
+    const d=new Date(t.date_operation+'T00:00:00');
+    return d.getFullYear()===AN&&d.getMonth()===MO});
   const inn=mois.reduce((s,t)=>s+Math.max(0,Number(t.montant)),0);
   const out=mois.reduce((s,t)=>s+Math.max(0,-Number(t.montant)),0);
   const mxt=Math.max(inn,out)||1;
@@ -720,6 +730,8 @@ function vFlux(){
     <div class="card"><div class="k">Sorties du mois</div><div class="v neg">${eur0(out)}</div>
       <div class="bar"><i style="width:${Math.round(out/mxt*100)}%;background:var(--coral)"></i></div></div>
   </div>
+
+  <div class="over" style="margin:8px 0 0;color:var(--faint)">hors virements entre tes comptes et frais pro</div>
 
   <div style="position:relative;margin-top:14px">
     <div style="position:absolute;left:14px;top:14px;color:var(--faint);pointer-events:none">${ic('search',20)}</div>

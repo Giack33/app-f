@@ -710,28 +710,42 @@ function vPiste(m){
   return h+`</div>`;
 }
 
+// Le mois civil fausse la lecture : les charges tombent debut de mois et le salaire
+// arrive le 25, donc du 1er au 24 les entrees sont quasi nulles face aux sorties.
+// On raisonne donc en cycle de paie : du jour de paie au jour precedant le suivant.
+function cyclePaie(){
+  const now=new Date(), jp=Math.min(28,Math.max(1,Number(D.set.jour_rappel_paie||25)));
+  const deb=new Date(now.getFullYear(),now.getMonth()-(now.getDate()<jp?1:0),jp);
+  const fin=new Date(deb.getFullYear(),deb.getMonth()+1,jp-1);
+  return {deb,fin,jp};
+}
+
 function vFlux(){
-  const now=new Date(), AN=now.getFullYear(), MO=now.getMonth();
+  const cy=cyclePaie();
+  const fmt=d=>d.toLocaleDateString('fr-FR',{day:'numeric',month:'short'});
   const mois=D.tx.filter(t=>{
     if(t.interne || t.statut==='ignoree' || transfertOuPro(t)) return false;
     const d=new Date(t.date_operation+'T00:00:00');
-    return d.getFullYear()===AN&&d.getMonth()===MO});
+    return d>=cy.deb && d<=cy.fin});
   const inn=mois.reduce((s,t)=>s+Math.max(0,Number(t.montant)),0);
   const out=mois.reduce((s,t)=>s+Math.max(0,-Number(t.montant)),0);
   const mxt=Math.max(inn,out)||1;
+  const solde=inn-out;
   const SEG=[['tout','Tout'],['dep','Dépenses'],['rev','Revenus'],['acl','À classer']];
 
-  let h=hd(now.toLocaleDateString('fr-FR',{month:'long',year:'numeric'}),'Mouvements',
+  let h=hd(`${fmt(cy.deb)} → ${fmt(cy.fin)}`,'Mouvements',
     `<span class="pill">${D.tx.length}</span>`);
 
   h+=`<div class="grid" style="margin-top:0">
-    <div class="card"><div class="k">Entrées du mois</div><div class="v pos">${eur0(inn)}</div>
+    <div class="card"><div class="k">Entrées du cycle</div><div class="v pos">${eur0(inn)}</div>
       <div class="bar"><i style="width:${Math.round(inn/mxt*100)}%;background:var(--lime)"></i></div></div>
-    <div class="card"><div class="k">Sorties du mois</div><div class="v neg">${eur0(out)}</div>
+    <div class="card"><div class="k">Sorties du cycle</div><div class="v neg">${eur0(out)}</div>
       <div class="bar"><i style="width:${Math.round(out/mxt*100)}%;background:var(--coral)"></i></div></div>
   </div>
 
-  <div class="over" style="margin:8px 0 0;color:var(--faint)">hors virements entre tes comptes et frais pro</div>
+  <div class="over" style="margin:8px 0 0;color:var(--faint)">cycle de paie (salaire du ${cy.jp}) ·
+    solde <b style="color:${solde<0?'var(--coral)':'var(--lime)'}">${eur0(solde)}</b> ·
+    hors virements entre tes comptes et frais pro</div>
 
   <div style="position:relative;margin-top:14px">
     <div style="position:absolute;left:14px;top:14px;color:var(--faint);pointer-events:none">${ic('search',20)}</div>

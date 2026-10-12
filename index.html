@@ -713,11 +713,23 @@ function vPiste(m){
 // Le mois civil fausse la lecture : les charges tombent debut de mois et le salaire
 // arrive le 25, donc du 1er au 24 les entrees sont quasi nulles face aux sorties.
 // On raisonne donc en cycle de paie : du jour de paie au jour precedant le suivant.
+// Le salaire ne tombe pas pile le jour reglé (23 sept. pour un reglage au 25) :
+// on ancre le cycle sur le dernier vrai versement de salaire des 45 derniers jours,
+// et on retombe sur le jour de paie reglé s'il n'y en a aucun.
 function cyclePaie(){
   const now=new Date(), jp=Math.min(28,Math.max(1,Number(D.set.jour_rappel_paie||25)));
-  const deb=new Date(now.getFullYear(),now.getMonth()-(now.getDate()<jp?1:0),jp);
-  const fin=new Date(deb.getFullYear(),deb.getMonth()+1,jp-1);
-  return {deb,fin,jp};
+  let deb=null, reel=false;
+  const lim=new Date(now); lim.setDate(lim.getDate()-45);
+  D.tx.forEach(t=>{
+    if(Number(t.montant)<=0 || t.statut==='ignoree' || t.interne) return;
+    if(!/salaire/i.test(D.catById[t.category_id]?.nom||'')) return;
+    const d=new Date(t.date_operation+'T00:00:00');
+    if(d<lim || d>now) return;
+    if(!deb || d>deb){ deb=d; reel=true }
+  });
+  if(!deb) deb=new Date(now.getFullYear(),now.getMonth()-(now.getDate()<jp?1:0),jp);
+  const fin=new Date(deb.getFullYear(),deb.getMonth()+1,deb.getDate()-1);
+  return {deb,fin,jp,reel};
 }
 
 function vFlux(){
@@ -743,7 +755,7 @@ function vFlux(){
       <div class="bar"><i style="width:${Math.round(out/mxt*100)}%;background:var(--coral)"></i></div></div>
   </div>
 
-  <div class="over" style="margin:8px 0 0;color:var(--faint)">cycle de paie (salaire du ${cy.jp}) ·
+  <div class="over" style="margin:8px 0 0;color:var(--faint)">${cy.reel?'depuis ton dernier salaire':`cycle de paie (salaire du ${cy.jp})`} ·
     solde <b style="color:${solde<0?'var(--coral)':'var(--lime)'}">${eur0(solde)}</b> ·
     hors virements entre tes comptes et frais pro</div>
 

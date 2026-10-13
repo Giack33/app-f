@@ -10,6 +10,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@500;600&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.117.3"></script>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
 <link rel="stylesheet" href="styles.css?v=16">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta name="apple-mobile-web-app-title" content="Trésorerie">
@@ -732,6 +734,28 @@ function cyclePaie(){
   return {deb,fin,jp,reel};
 }
 
+// Ce qu'un autre membre du foyer verse sur le compte commun depuis un compte non
+// synchronise : cet argent finance une part des charges communes, donc on le deduit
+// des sorties au lieu de le compter en entree (sinon le solde du cycle est fausse).
+function apportFoyer(deb,fin){
+  const moi=U&&U.id;
+  const mots=[];
+  (D.profils||[]).forEach(p=>{ if(p.id===moi) return;
+    sansAccent(p.full_name||'').split(/[^A-Z]+/).forEach(w=>{ if(w.length>=4) mots.push(w) }) });
+  if(!mots.length) return 0;
+  let s=0;
+  D.tx.forEach(t=>{
+    const v=Number(t.montant);
+    if(v<=0 || t.statut==='ignoree' || t.interne) return;
+    const lib=sansAccent(t.libelle||'');
+    if(!mots.some(w=>lib.includes(w))) return;
+    const d=new Date(t.date_operation+'T00:00:00');
+    if(d<deb || d>fin) return;
+    s+=v;
+  });
+  return s;
+}
+
 function vFlux(){
   const cy=cyclePaie();
   const fmt=d=>d.toLocaleDateString('fr-FR',{day:'numeric',month:'short'});
@@ -740,7 +764,9 @@ function vFlux(){
     const d=new Date(t.date_operation+'T00:00:00');
     return d>=cy.deb && d<=cy.fin});
   const inn=mois.reduce((s,t)=>s+Math.max(0,Number(t.montant)),0);
-  const out=mois.reduce((s,t)=>s+Math.max(0,-Number(t.montant)),0);
+  const brut=mois.reduce((s,t)=>s+Math.max(0,-Number(t.montant)),0);
+  const apport=Math.min(brut,apportFoyer(cy.deb,cy.fin));
+  const out=brut-apport;
   const mxt=Math.max(inn,out)||1;
   const solde=inn-out;
   const SEG=[['tout','Tout'],['dep','Dépenses'],['rev','Revenus'],['acl','À classer']];
@@ -757,7 +783,7 @@ function vFlux(){
 
   <div class="over" style="margin:8px 0 0;color:var(--faint)">${cy.reel?'depuis ton dernier salaire':`cycle de paie (salaire du ${cy.jp})`} ·
     solde <b style="color:${solde<0?'var(--coral)':'var(--lime)'}">${eur0(solde)}</b> ·
-    hors virements entre tes comptes et frais pro</div>
+    hors virements entre tes comptes et frais pro${apport?` · ${eur0(apport)} de charges communes financées par le foyer, déduits des sorties`:''}</div>
 
   <div style="position:relative;margin-top:14px">
     <div style="position:absolute;left:14px;top:14px;color:var(--faint);pointer-events:none">${ic('search',20)}</div>
